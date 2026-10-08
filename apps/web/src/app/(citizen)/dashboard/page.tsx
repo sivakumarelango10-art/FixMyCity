@@ -200,6 +200,61 @@ export default function CitizenDashboardPage() {
 
       <Welcome />
 
+      {/* Quick Services (UI.md Section 14: Mobile-first civic actions) */}
+      <section aria-label="Quick city services" className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+        <Link
+          href="/dashboard/complaints/new"
+          className="group flex flex-col items-center justify-center gap-2.5 rounded-[12px] border border-line bg-surface p-4 text-center transition-[border-color,box-shadow,transform] duration-150 hover:border-accent hover:shadow-[0_1px_3px_rgba(15,35,32,0.06)] active:scale-[0.98]"
+        >
+          <span className="grid h-12 w-12 place-items-center rounded-full bg-accent/10 text-accent transition-colors group-hover:bg-accent group-hover:text-white">
+            <PlusCircle size={24} weight="bold" />
+          </span>
+          <div>
+            <span className="block text-sm font-semibold text-fg">Report Issue</span>
+            <span className="block text-xs text-fg-muted">Roads, lights & sanitation</span>
+          </div>
+        </Link>
+
+        <Link
+          href="/dashboard/utilities"
+          className="group flex flex-col items-center justify-center gap-2.5 rounded-[12px] border border-line bg-surface p-4 text-center transition-[border-color,box-shadow,transform] duration-150 hover:border-accent hover:shadow-[0_1px_3px_rgba(15,35,32,0.06)] active:scale-[0.98]"
+        >
+          <span className="grid h-12 w-12 place-items-center rounded-full bg-accent/10 text-accent transition-colors group-hover:bg-accent group-hover:text-white">
+            <Receipt size={24} weight="bold" />
+          </span>
+          <div>
+            <span className="block text-sm font-semibold text-fg">Pay Bills</span>
+            <span className="block text-xs text-fg-muted">Water, power & taxes</span>
+          </div>
+        </Link>
+
+        <Link
+          href="/dashboard/city-map"
+          className="group flex flex-col items-center justify-center gap-2.5 rounded-[12px] border border-line bg-surface p-4 text-center transition-[border-color,box-shadow,transform] duration-150 hover:border-accent hover:shadow-[0_1px_3px_rgba(15,35,32,0.06)] active:scale-[0.98]"
+        >
+          <span className="grid h-12 w-12 place-items-center rounded-full bg-accent/10 text-accent transition-colors group-hover:bg-accent group-hover:text-white">
+            <MapTrifold size={24} weight="bold" />
+          </span>
+          <div>
+            <span className="block text-sm font-semibold text-fg">City Map</span>
+            <span className="block text-xs text-fg-muted">Live civic issue tracker</span>
+          </div>
+        </Link>
+
+        <Link
+          href="/dashboard/announcements"
+          className="group flex flex-col items-center justify-center gap-2.5 rounded-[12px] border border-line bg-surface p-4 text-center transition-[border-color,box-shadow,transform] duration-150 hover:border-accent hover:shadow-[0_1px_3px_rgba(15,35,32,0.06)] active:scale-[0.98]"
+        >
+          <span className="grid h-12 w-12 place-items-center rounded-full bg-accent/10 text-accent transition-colors group-hover:bg-accent group-hover:text-white">
+            <Megaphone size={24} weight="bold" />
+          </span>
+          <div>
+            <span className="block text-sm font-semibold text-fg">City Updates</span>
+            <span className="block text-xs text-fg-muted">Official ward notices</span>
+          </div>
+        </Link>
+      </section>
+
       {q.isError && <ErrorState className="panel" title="Your dashboard could not be loaded" message={(q.error as Error).message} onRetry={() => q.refetch()} />}
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">

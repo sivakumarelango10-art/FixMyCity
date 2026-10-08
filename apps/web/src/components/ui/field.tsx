@@ -5,12 +5,12 @@ import * as LabelPrimitive from '@radix-ui/react-label';
 import { WarningCircle } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
 
-/* 16px text on small screens prevents iOS from zooming into focused fields. */
+/* UI.md Section 11: Inputs: white bg, #DCE4E2 border, 10px radius, 48px min height, 16px text on small screens */
 export const inputBase =
-  'w-full rounded-control border border-line-strong bg-surface px-3.5 text-base text-fg transition-[border-color,box-shadow,background-color] duration-150 hover:border-fg-subtle focus:border-accent focus:outline-none focus:ring-[3px] focus:ring-accent-soft disabled:cursor-not-allowed disabled:bg-surface-2 disabled:opacity-70 aria-[invalid=true]:border-danger aria-[invalid=true]:focus:ring-danger-soft sm:text-[15px]';
+  'w-full rounded-[10px] border border-line bg-surface px-3.5 text-base text-fg transition-[border-color,box-shadow,background-color] duration-150 hover:border-line-strong focus:border-accent focus:outline-none focus:ring-[3px] focus:ring-accent-soft disabled:cursor-not-allowed disabled:bg-surface-2 disabled:opacity-70 aria-[invalid=true]:border-danger aria-[invalid=true]:focus:ring-danger-soft sm:text-[15px]';
 
 export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(({ className, ...props }, ref) => (
-  <input ref={ref} className={cn(inputBase, 'h-11', className)} {...props} />
+  <input ref={ref} className={cn(inputBase, 'min-h-[48px] h-12', className)} {...props} />
 ));
 Input.displayName = 'Input';
 

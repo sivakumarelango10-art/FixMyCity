@@ -69,7 +69,7 @@ export function GoogleAuthButton({
       type="button"
       onClick={handleGoogleAuth}
       disabled={loading}
-      className="relative flex w-full items-center justify-center gap-3 rounded-control border border-line bg-surface px-4 py-2.5 text-sm font-semibold text-fg shadow-xs transition-all hover:border-line-strong hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-accent active:scale-[0.99] disabled:opacity-60 cursor-pointer"
+      className="relative flex h-12 w-full items-center justify-center gap-3 rounded-[10px] border border-line bg-surface px-4 text-sm font-semibold text-fg shadow-xs transition-colors hover:border-line-strong hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-accent disabled:opacity-60 cursor-pointer"
     >
       <GoogleIcon className="shrink-0" />
       <span>{loading ? 'Connecting to Google…' : mode === 'signup' ? 'Sign up with Google' : 'Continue with Google'}</span>

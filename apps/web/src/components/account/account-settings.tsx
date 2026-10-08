@@ -250,7 +250,7 @@ export function ProfileOverview() {
   return (
     <Panel className="overflow-hidden">
       <div className="grid justify-items-start gap-4 p-5 sm:p-6">
-        <span className="grid h-16 w-16 place-items-center rounded-full bg-[#13234a] text-xl font-bold text-[#e9eef7]" aria-hidden>
+        <span className="grid h-16 w-16 place-items-center rounded-full bg-console text-xl font-bold text-console-fg" aria-hidden>
           {initials(user.name)}
         </span>
         <div className="grid min-w-0 gap-0.5">

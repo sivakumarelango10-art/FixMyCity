@@ -27,7 +27,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
   useOnChange(pathname, () => setOpen(false));
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-bg-elevated backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-line bg-surface">
       <div className="container-page flex h-16 items-center justify-between gap-6">
         <Logo />
         <nav aria-label="Main" className="hidden h-full items-stretch lg:flex">
@@ -78,7 +78,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
           {open && (
             <DialogPrimitive.Portal forceMount>
               <DialogPrimitive.Overlay asChild forceMount>
-                <motion.div className="fixed inset-0 z-50 bg-[#060b17]/55 lg:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
+                <motion.div className="fixed inset-0 z-50 bg-[#172322]/50 lg:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
               </DialogPrimitive.Overlay>
               <DialogPrimitive.Content asChild forceMount>
                 <motion.div

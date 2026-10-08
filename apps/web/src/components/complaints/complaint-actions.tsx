@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { ArrowCounterClockwise, CheckCircle, ImageSquare, LockSimple, Megaphone, Sparkle, Star, Wrench, XCircle } from '@phosphor-icons/react';
+import { ArrowCounterClockwise, CheckCircle, ImageSquare, LockSimple, MagnifyingGlass, Megaphone, Star, Wrench, XCircle } from '@phosphor-icons/react';
 import {
   CATEGORY_META,
   COMPLAINT_CATEGORIES,
@@ -140,7 +140,7 @@ export function AssignPanel({ complaint }: { complaint: ComplaintDetail }) {
 /* ------------------------------------------------------------------ */
 
 const STATUS_ACTION: Partial<Record<ComplaintStatus, { label: string; icon: typeof Wrench; tone: 'primary' | 'secondary' | 'danger' }>> = {
-  UNDER_REVIEW: { label: 'Start review', icon: Sparkle, tone: 'secondary' },
+  UNDER_REVIEW: { label: 'Start review', icon: MagnifyingGlass, tone: 'secondary' },
   IN_PROGRESS: { label: 'Start work', icon: Wrench, tone: 'primary' },
   RESOLVED: { label: 'Mark resolved', icon: CheckCircle, tone: 'primary' },
   REJECTED: { label: 'Reject', icon: XCircle, tone: 'danger' },

@@ -6,7 +6,7 @@ import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'motion/react';
-import { ArrowRight, Check, CheckCircle, Copy, MapPin, NotePencil, Sparkle, Warning } from '@phosphor-icons/react';
+import { ArrowRight, Check, CheckCircle, Copy, MapPin, NotePencil, Sliders, Warning } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 import {
   CATEGORY_META,
@@ -357,11 +357,11 @@ export function ReportForm() {
             <AnimatePresence mode="wait" initial={false}>
               {(values.description ?? '').trim().length < 20 ? (
                 <motion.p key="hint" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2 text-sm text-fg-subtle">
-                  <Sparkle size={16} aria-hidden /> Write at least 20 characters of description to get a suggested category, department and priority.
+                  <Sliders size={16} aria-hidden /> Write at least 20 characters of description to get a suggested category, department and priority.
                 </motion.p>
               ) : suggestion.isFetching && !s ? (
                 <motion.p key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2 text-sm text-fg-muted">
-                  <Sparkle size={16} className="text-accent-text motion-safe:animate-pulse" aria-hidden /> Reading your description
+                  <Sliders size={16} className="text-accent-text motion-safe:animate-pulse" aria-hidden /> Reading your description
                 </motion.p>
               ) : suggestion.isError ? (
                 <motion.p key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-fg-subtle">
@@ -377,7 +377,7 @@ export function ReportForm() {
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <p className="flex items-center gap-2 text-sm font-semibold text-fg">
-                      <Sparkle size={16} weight="fill" className="text-accent-text" aria-hidden /> Suggestion
+                      <Sliders size={16} weight="bold" className="text-accent-text" aria-hidden /> Suggestion
                     </p>
                     {values.category !== s.suggestedCategory ? (
                       <Button type="button" variant="secondary" size="sm" onClick={() => setValue('category', s.suggestedCategory as ComplaintCategory, { shouldValidate: true })}>

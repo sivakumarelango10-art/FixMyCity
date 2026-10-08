@@ -24,7 +24,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       {/* Brand panel: what you get after signing in, shown with a real screenshot of the tracking page. */}
       <aside className="relative hidden overflow-hidden border-l border-line bg-surface-2 lg:flex lg:flex-col lg:justify-between lg:gap-10 lg:py-14 lg:pl-14">
-        <div aria-hidden className="absolute inset-0 opacity-60 [background-image:linear-gradient(var(--border)_1px,transparent_1px),linear-gradient(90deg,var(--border)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:linear-gradient(to_bottom,black,transparent_70%)]" />
         <div className="relative grid max-w-md gap-4 pr-14">
           <p className="type-section text-fg">One account for the services your city already offers.</p>
           <p className="text-[15px] leading-relaxed text-fg-muted">Report an issue, follow it from submission to resolution, and keep your bills and city notices in the same place.</p>

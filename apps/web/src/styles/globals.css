@@ -17,128 +17,133 @@
  */
 
 :root {
+  /* Civic Teal Design System (UI.md & Design.md) */
+  /* Brand */
+  --primary: #176B68;
+  --primary-dark: #125452;
+  --primary-hover: #125452;
+  --primary-foreground: #FFFFFF;
+  --primary-text: #176B68;
+  --primary-soft: rgba(23, 107, 104, 0.08);
+  --primary-border: rgba(23, 107, 104, 0.22);
+  --focus-ring: #176B68;
+
   /* Surfaces */
-  --background: #f4f4f1;
-  --surface: #fcfcfa;
-  --surface-elevated: #fefefd;
-  --surface-sunken: #efeeea;
-  --surface-strong: #e5e4df;
-  --border: #e0ded8;
-  --border-strong: #c9c6be;
+  --background: #F7F9F8;
+  --surface: #FFFFFF;
+  --surface-elevated: #FFFFFF;
+  --surface-sunken: #F0F4F2;
+  --surface-strong: #E3ECE9;
+  --border: #DCE4E2;
+  --border-strong: #C4D2CF;
 
-  /* Text (navy ink) */
-  --text-primary: #0f1a2e;
-  --text-secondary: #475164;
-  --text-muted: #5f6878;
+  /* Text (charcoal and muted teal-gray) */
+  --text-primary: #172322;
+  --text-secondary: #687674;
+  --text-muted: #83918F;
 
-  /* Action color */
-  --primary: #0b62c4;
-  --primary-hover: #0a54a8;
-  --primary-foreground: #fbfcff;
-  --primary-text: #0b5fbd;
-  --primary-soft: rgb(11 98 196 / 0.09);
-  --primary-border: rgb(11 98 196 / 0.32);
-  --focus-ring: #0b62c4;
+  /* Civic Teal wordmark */
+  --brand-teal: #176B68;
 
-  /* Brand teal: the wordmark and logo only, never a UI accent. */
-  --brand-teal: #0b7774;
+  /* Semantic Feedback */
+  --success: #287A50;
+  --success-soft: rgba(40, 122, 80, 0.08);
+  --warning: #A66A25;
+  --warning-soft: rgba(166, 106, 37, 0.08);
+  --danger: #C4473F;
+  --danger-soft: rgba(196, 71, 63, 0.08);
+  --info: #356F8A;
+  --info-soft: rgba(53, 111, 138, 0.08);
 
-  /* Feedback */
-  --success: #1b7347;
-  --success-soft: rgb(27 115 71 / 0.1);
-  --warning: #985400;
-  --warning-soft: rgb(217 133 0 / 0.14);
-  --danger: #b8322a;
-  --danger-soft: rgb(184 50 42 / 0.09);
+  /* Complaint status */
+  --st-submitted: #176B68;
+  --st-review: #356F8A;
+  --st-assigned: #176B68;
+  --st-progress: #A66A25;
+  --st-resolved: #287A50;
+  --st-rejected: #C4473F;
+  --st-reopened: #8C4368;
 
-  /* Complaint status (state only, never decoration) */
-  --st-submitted: #556072;
-  --st-review: #6346bd;
-  --st-assigned: #0b6f87;
-  --st-progress: #a14c00;
-  --st-resolved: #1b7347;
-  --st-rejected: #b8322a;
-  --st-reopened: #a9305f;
+  /* Operations console rail */
+  --console-bg: #125452;
+  --console-fg: #F7F9F8;
+  --console-muted: #A3C2BF;
+  --console-line: rgba(255, 255, 255, 0.12);
+  --console-hover: rgba(255, 255, 255, 0.08);
+  --console-active: rgba(255, 255, 255, 0.16);
+  --console-accent: #54B4B0;
 
-  /* Operations console rail (admin and department workspaces) */
-  --console-bg: #111d38;
-  --console-fg: #eef2f9;
-  --console-muted: #a3b2cc;
-  --console-line: rgb(255 255 255 / 0.09);
-  --console-hover: rgb(255 255 255 / 0.06);
-  --console-active: rgb(255 255 255 / 0.11);
-  --console-accent: #7cc0ff;
-
-  --shadow-tint: 222 45% 18%;
-  --map-tiles: saturate(0.32) contrast(0.96) brightness(1.03);
+  --shadow-tint: 174 40% 10%;
+  --map-tiles: saturate(0.65) contrast(0.98) brightness(1.01);
   --pin-on-color: #ffffff;
 
-  /* Chart series (validated on #fcfcfa: all six checks pass) */
-  --chart-1: #0b62c4;
-  --chart-2: #a35f00;
-  --chart-3: #138a5b;
+  /* Chart series */
+  --chart-1: #176B68;
+  --chart-2: #A66A25;
+  --chart-3: #287A50;
 }
 
 .dark {
-  --background: #0a1020;
-  --surface: #0f1729;
-  --surface-elevated: #141e34;
-  --surface-sunken: #151f35;
-  --surface-strong: #1c2840;
-  --border: #1f2b42;
-  --border-strong: #2e3c58;
+  --background: #0E1817;
+  --surface: #132221;
+  --surface-elevated: #182C2A;
+  --surface-sunken: #101E1D;
+  --surface-strong: #1F3634;
+  --border: #233D3A;
+  --border-strong: #2D4D49;
 
-  --text-primary: #edf1f7;
-  --text-secondary: #b0bacb;
-  --text-muted: #8b96a9;
+  --text-primary: #F7F9F8;
+  --text-secondary: #9CB0AD;
+  --text-muted: #7A918E;
 
-  --primary: #4da3ff;
-  --primary-hover: #72b6ff;
-  --primary-foreground: #0a1020;
-  --primary-text: #62adf5;
-  --primary-soft: rgb(77 163 255 / 0.14);
-  --primary-border: rgb(77 163 255 / 0.38);
-  --focus-ring: #62adf5;
+  --primary: #249490;
+  --primary-hover: #2EB3AE;
+  --primary-foreground: #0E1817;
+  --primary-text: #3ABDB8;
+  --primary-soft: rgba(36, 148, 144, 0.15);
+  --primary-border: rgba(36, 148, 144, 0.35);
+  --focus-ring: #3ABDB8;
 
-  --brand-teal: #2cc2bd;
+  --brand-teal: #3ABDB8;
 
-  --success: #4fcf93;
-  --success-soft: rgb(79 207 147 / 0.12);
-  --warning: #f0b14a;
-  --warning-soft: rgb(240 177 74 / 0.13);
-  --danger: #ff7f73;
-  --danger-soft: rgb(255 127 115 / 0.12);
+  --success: #3EAB74;
+  --success-soft: rgba(62, 171, 116, 0.14);
+  --warning: #C7863B;
+  --warning-soft: rgba(199, 134, 59, 0.14);
+  --danger: #DB5D55;
+  --danger-soft: rgba(219, 93, 85, 0.14);
+  --info: #4F8FA8;
+  --info-soft: rgba(79, 143, 168, 0.14);
 
-  --st-submitted: #a9b4c7;
-  --st-review: #b7a1ff;
-  --st-assigned: #4fc9e3;
-  --st-progress: #f0b14a;
-  --st-resolved: #4fcf93;
-  --st-rejected: #ff7f73;
-  --st-reopened: #ff8fb8;
+  --st-submitted: #3ABDB8;
+  --st-review: #4F8FA8;
+  --st-assigned: #3ABDB8;
+  --st-progress: #C7863B;
+  --st-resolved: #3EAB74;
+  --st-rejected: #DB5D55;
+  --st-reopened: #B35E88;
 
-  --console-bg: #0c1325;
-  --console-fg: #edf1f7;
-  --console-muted: #95a2b8;
-  --console-line: rgb(255 255 255 / 0.07);
-  --console-hover: rgb(255 255 255 / 0.05);
-  --console-active: rgb(255 255 255 / 0.09);
-  --console-accent: #62adf5;
+  --console-bg: #0B1413;
+  --console-fg: #F7F9F8;
+  --console-muted: #8EAAA7;
+  --console-line: rgba(255, 255, 255, 0.08);
+  --console-hover: rgba(255, 255, 255, 0.06);
+  --console-active: rgba(255, 255, 255, 0.12);
+  --console-accent: #3ABDB8;
 
-  --shadow-tint: 228 60% 3%;
-  --map-tiles: invert(1) hue-rotate(200deg) brightness(0.92) contrast(0.86) saturate(0.32);
-  --pin-on-color: #0a1020;
+  --shadow-tint: 174 50% 3%;
+  --map-tiles: invert(1) hue-rotate(160deg) brightness(0.92) contrast(0.88) saturate(0.35);
+  --pin-on-color: #0E1817;
 
-  /* Chart series stepped for the dark band (validated on #0f1729) */
-  --chart-1: #3b8fe6;
-  --chart-2: #c08220;
-  --chart-3: #239c74;
+  --chart-1: #3ABDB8;
+  --chart-2: #C7863B;
+  --chart-3: #3EAB74;
 }
 
 @theme inline {
   /* Utility names map onto the semantic tokens above. */
   --color-bg: var(--background);
-  --color-bg-elevated: color-mix(in oklab, var(--background) 88%, transparent);
+  --color-bg-elevated: color-mix(in oklab, var(--background) 92%, transparent);
   --color-surface: var(--surface);
   --color-surface-elevated: var(--surface-elevated);
   --color-surface-2: var(--surface-sunken);
@@ -161,6 +166,8 @@
   --color-warning-soft: var(--warning-soft);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
   --color-st-submitted: var(--st-submitted);
   --color-st-review: var(--st-review);
   --color-st-assigned: var(--st-assigned);
@@ -184,12 +191,17 @@
   --text-caption: 0.8125rem;
   --text-caption--line-height: 1.45;
 
-  --radius-chip: 6px;
+  /* UI.md Section 7 Radius Scale */
+  --radius-chip: 9999px;
   --radius-control: 8px;
+  --radius-input: 10px;
   --radius-panel: 12px;
+  --radius-container: 16px;
+  --radius-sheet: 20px;
 
-  --shadow-panel: 0 1px 2px hsl(var(--shadow-tint) / 0.05);
-  --shadow-pop: 0 2px 6px -2px hsl(var(--shadow-tint) / 0.14), 0 16px 40px -16px hsl(var(--shadow-tint) / 0.32);
+  /* UI.md Section 8 Shadow Scale */
+  --shadow-panel: 0 1px 3px rgba(15, 35, 32, 0.06);
+  --shadow-pop: 0 4px 12px rgba(15, 35, 32, 0.08);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }

@@ -130,12 +130,12 @@ export function PhotoDropzone({
               <button
                 type="button"
                 onClick={() => remove(p.id)}
-                className="absolute right-1.5 top-1.5 grid h-9 w-9 place-items-center rounded-full bg-[#060b17]/75 text-white transition-colors hover:bg-[#060b17]/90"
+                className="absolute right-1.5 top-1.5 grid h-9 w-9 place-items-center rounded-full bg-[#172322]/75 text-white transition-colors hover:bg-[#172322]/90"
                 aria-label={`Remove ${p.file.name}`}
               >
                 <Trash size={15} />
               </button>
-              <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-[#060b17]/80 to-transparent px-2 pb-1.5 pt-4 text-[11px] text-white">
+              <span className="absolute inset-x-0 bottom-0 truncate bg-[#172322]/80 px-2 py-1 text-[11px] font-medium text-white">
                 {(p.file.size / MB).toFixed(1)} MB
               </span>
             </motion.li>

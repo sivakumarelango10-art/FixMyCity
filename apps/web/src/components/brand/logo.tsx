@@ -21,8 +21,8 @@ export function LogoMark({ className, size = 28 }: { className?: string; size?: 
 export function Wordmark({ className }: { className?: string }) {
   return (
     <span className={cn('text-[17px] font-bold tracking-[-0.02em] text-fg [font-variation-settings:"wdth"_108]', className)}>
-      Fix<span className="text-accent-text">My</span>
-      <span className="text-brand-teal">City</span>
+      Fix<span className="text-accent">My</span>
+      <span className="text-accent hover:text-[#125452]">City</span>
     </span>
   );
 }

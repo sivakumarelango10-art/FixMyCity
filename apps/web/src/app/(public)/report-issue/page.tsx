@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { Camera, MapPin, Sparkle, Timer } from '@phosphor-icons/react/dist/ssr';
+import { Camera, MapPin, NotePencil, Timer } from '@phosphor-icons/react/dist/ssr';
 import { homePathForRole } from '@fixmycity/shared';
 import { Button } from '@/components/ui/button';
 import { Notice } from '@/components/ui/primitives';
@@ -10,7 +10,7 @@ import { getSessionUser } from '@/lib/session';
 export const metadata: Metadata = { title: 'Report an Issue' };
 
 const STEPS = [
-  { icon: Sparkle, title: 'Describe it', body: 'A short headline and a few details. A suggested category and department appear as you type.' },
+  { icon: NotePencil, title: 'Describe it', body: 'A short headline and a few details. A suggested category and department appear as you type.' },
   { icon: Camera, title: 'Add a photo', body: 'JPEG, PNG or WebP up to 5 MB. Location data inside the photo is removed.' },
   { icon: MapPin, title: 'Pin the location', body: 'Use your current location or tap the map. A landmark helps crews find it.' },
   { icon: Timer, title: 'Track it', body: 'You get a tracking ID straight away and an alert every time the status changes.' },

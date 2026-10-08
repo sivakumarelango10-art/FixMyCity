@@ -52,7 +52,7 @@ export function Hero() {
               ariaLabel="Map of civic issue reports across the demo city"
             />
             <div className="pointer-events-none absolute bottom-3 left-3 z-[500] hidden w-[250px] sm:block">
-              <div className="pointer-events-auto rounded-panel border border-line bg-surface-elevated/95 p-3.5 shadow-[var(--shadow-pop)] backdrop-blur-sm">
+              <div className="pointer-events-auto rounded-panel border border-line bg-surface p-3.5 shadow-card">
                 <p className="mb-2.5 text-xs font-semibold text-fg">{isLoading ? 'Loading reports' : 'On the map now'}</p>
                 <MapLegend items={complaints} className="[&>p]:hidden" />
               </div>

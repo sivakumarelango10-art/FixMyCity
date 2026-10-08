@@ -40,26 +40,26 @@ export const STATUS_ICONS: Record<ComplaintStatus, Icon> = {
   REOPENED: ArrowCounterClockwise,
 };
 
-/** Tailwind classes per status. Always rendered together with an icon and label. */
+/** Tailwind classes per status (UI.md Section 20). Always rendered together with an icon and label. */
 export const STATUS_STYLES: Record<ComplaintStatus, { text: string; bg: string; border: string; dot: string }> = {
-  SUBMITTED: { text: 'text-st-submitted', bg: 'bg-st-submitted/10', border: 'border-st-submitted/30', dot: 'bg-st-submitted' },
-  UNDER_REVIEW: { text: 'text-st-review', bg: 'bg-st-review/10', border: 'border-st-review/30', dot: 'bg-st-review' },
-  ASSIGNED: { text: 'text-st-assigned', bg: 'bg-st-assigned/10', border: 'border-st-assigned/30', dot: 'bg-st-assigned' },
-  IN_PROGRESS: { text: 'text-st-progress', bg: 'bg-st-progress/10', border: 'border-st-progress/30', dot: 'bg-st-progress' },
-  RESOLVED: { text: 'text-st-resolved', bg: 'bg-st-resolved/10', border: 'border-st-resolved/30', dot: 'bg-st-resolved' },
-  REJECTED: { text: 'text-st-rejected', bg: 'bg-st-rejected/10', border: 'border-st-rejected/30', dot: 'bg-st-rejected' },
-  REOPENED: { text: 'text-st-reopened', bg: 'bg-st-reopened/10', border: 'border-st-reopened/30', dot: 'bg-st-reopened' },
+  SUBMITTED: { text: 'text-[#176B68]', bg: 'bg-[#176B68]/10', border: 'border-[#176B68]/20', dot: 'bg-[#176B68]' },
+  UNDER_REVIEW: { text: 'text-[#356F8A]', bg: 'bg-[#356F8A]/10', border: 'border-[#356F8A]/20', dot: 'bg-[#356F8A]' },
+  ASSIGNED: { text: 'text-[#176B68]', bg: 'bg-[#176B68]/10', border: 'border-[#176B68]/20', dot: 'bg-[#176B68]' },
+  IN_PROGRESS: { text: 'text-[#A66A25]', bg: 'bg-[#A66A25]/10', border: 'border-[#A66A25]/20', dot: 'bg-[#A66A25]' },
+  RESOLVED: { text: 'text-[#287A50]', bg: 'bg-[#287A50]/10', border: 'border-[#287A50]/20', dot: 'bg-[#287A50]' },
+  REJECTED: { text: 'text-[#C4473F]', bg: 'bg-[#C4473F]/10', border: 'border-[#C4473F]/20', dot: 'bg-[#C4473F]' },
+  REOPENED: { text: 'text-[#8C4368]', bg: 'bg-[#8C4368]/10', border: 'border-[#8C4368]/20', dot: 'bg-[#8C4368]' },
 };
 
-/** Status plate: icon and label on a tint of the status color. */
+/** Status plate: compact badge with subtle tint (UI.md Section 20). */
 export function StatusBadge({ status, className, size = 'md' }: { status: ComplaintStatus; className?: string; size?: 'sm' | 'md' }) {
   const Icon = STATUS_ICONS[status];
   const s = STATUS_STYLES[status];
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 whitespace-nowrap rounded-chip border font-semibold',
-        size === 'sm' ? 'px-1.5 py-0.5 text-[11.5px]' : 'px-2 py-1 text-xs',
+        'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border font-semibold',
+        size === 'sm' ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs',
         s.text,
         s.bg,
         s.border,
@@ -115,16 +115,16 @@ export function PriorityLabel({ priority, suggested, className }: { priority: Pr
   );
 }
 export const CATEGORY_COLORS: Record<ComplaintCategory, string> = {
-  POTHOLES: '#f59e0b',
-  ROAD_DAMAGE: '#ea580c',
-  WATER_LEAKAGE: '#0284c7',
-  GARBAGE_COLLECTION: '#10b981',
-  STREETLIGHT_FAILURE: '#eab308',
-  DRAINAGE: '#2563eb',
-  PUBLIC_SANITATION: '#0d9488',
-  TRAFFIC_INFRASTRUCTURE: '#8b5cf6',
-  PUBLIC_PROPERTY_DAMAGE: '#e11d48',
-  OTHER: '#64748b',
+  POTHOLES: '#176B68',
+  ROAD_DAMAGE: '#125452',
+  WATER_LEAKAGE: '#356F8A',
+  GARBAGE_COLLECTION: '#287A50',
+  STREETLIGHT_FAILURE: '#A66A25',
+  DRAINAGE: '#2F6174',
+  PUBLIC_SANITATION: '#1E6B5C',
+  TRAFFIC_INFRASTRUCTURE: '#445654',
+  PUBLIC_PROPERTY_DAMAGE: '#8C4368',
+  OTHER: '#687674',
 };
 
 export const CATEGORY_ICONS: Record<ComplaintCategory, Icon> = {

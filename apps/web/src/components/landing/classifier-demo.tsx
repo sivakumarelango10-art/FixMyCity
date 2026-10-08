@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Sparkle } from '@phosphor-icons/react';
+import { Sliders } from '@phosphor-icons/react';
 import { CATEGORY_META, PRIORITY_LABELS, classifyWithRules } from '@fixmycity/shared';
 import { CategoryChip, PriorityLabel } from '@/components/common/complaint-meta';
 import { Textarea } from '@/components/ui/field';
@@ -72,7 +72,7 @@ export function ClassifierDemo() {
                   className="grid gap-4"
                 >
                   <p className="flex items-center gap-2 text-xs font-semibold text-fg-subtle">
-                    <Sparkle size={14} weight="fill" className="text-accent-text" /> Suggested by the local rule-based classifier
+                    <Sliders size={14} weight="bold" className="text-accent-text" /> Suggested by the local rule-based classifier
                   </p>
                   <dl className="grid gap-4 sm:grid-cols-3">
                     <div className="grid content-start gap-1.5">

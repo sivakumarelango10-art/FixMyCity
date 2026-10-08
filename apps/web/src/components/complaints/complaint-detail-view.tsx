@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowSquareOut, Copy, EnvelopeSimple, Phone, Sparkle, User } from '@phosphor-icons/react';
+import { ArrowsClockwise, ArrowSquareOut, Copy, EnvelopeSimple, Phone, User } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 import {
   CATEGORY_META,
@@ -50,7 +50,7 @@ function ClassificationCard({ complaint, mode }: { complaint: ComplaintDetail; m
         action={
           mode === 'admin' ? (
             <Button size="sm" variant="ghost" loading={reclassify.isPending} onClick={() => reclassify.mutate()}>
-              <Sparkle size={14} /> Re-run
+              <ArrowsClockwise size={14} /> Re-run
             </Button>
           ) : undefined
         }

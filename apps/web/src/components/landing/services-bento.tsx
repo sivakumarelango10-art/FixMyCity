@@ -112,13 +112,8 @@ export function ServicesBento() {
             </div>
           </Cell>
 
-          {/* Issue map: street-grid pattern, the same blue as open reports on the map. */}
-          <Cell delay={0.06} className="bg-accent-soft md:col-span-5" href="/services#issue-map" label="How the map works">
-            {/* Street grid, fading out where the text sits. */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 [background-image:linear-gradient(color-mix(in_oklab,var(--primary)_16%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_oklab,var(--primary)_16%,transparent)_1px,transparent_1px)] [background-size:44px_44px] [mask-image:linear-gradient(to_left,black_15%,transparent_75%)]"
-            />
+          {/* Issue map: clean Civic Teal surface */}
+          <Cell delay={0.06} className="bg-surface-2 md:col-span-5" href="/services#issue-map" label="How the map works">
             <MapTrifold size={26} className="relative text-accent-text" aria-hidden />
             <h3 className="relative mt-4 text-lg font-semibold tracking-[-0.015em] text-fg">Issue map</h3>
             <p className="relative mt-2 max-w-[30ch] text-sm leading-relaxed text-fg-muted">See what is already reported nearby before you file, and watch pins change as work moves.</p>

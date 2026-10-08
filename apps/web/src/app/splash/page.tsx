@@ -9,7 +9,7 @@ export default function SplashPreviewPage() {
   const [playKey, setPlayKey] = React.useState(1);
 
   return (
-    <div className="relative min-h-screen bg-[#FFFFFF] text-slate-900">
+    <div className="relative min-h-screen bg-bg text-fg">
       {/* Cinematic Splash Animation Instance */}
       <CinematicSplash
         key={playKey}
@@ -22,24 +22,23 @@ export default function SplashPreviewPage() {
       {/* Control panel shown underneath when splash completes or is dismissed */}
       <div className="flex min-h-screen flex-col items-center justify-center p-6 text-center">
         <div className="max-w-md space-y-4">
-          <h1 className="text-3xl font-extrabold tracking-tight text-[#111d4a]">
-            FixMy<span className="text-[#00A3FF]">City</span> Intro
+          <h1 className="text-3xl font-extrabold tracking-tight text-fg">
+            FixMy<span className="text-accent">City</span> Intro
           </h1>
-          <p className="text-sm text-slate-600">
-            5-second cinematic startup animation preview. Runs smooth 60fps vector transitions on a pure white canvas.
+          <p className="text-sm text-fg-muted">
+            5-second cinematic startup animation preview. Runs smooth 60fps vector transitions on a pure civic canvas.
           </p>
 
           <div className="flex justify-center gap-3 pt-4">
             <Button
               size="lg"
               onClick={() => setPlayKey((k) => k + 1)}
-              className="bg-[#00A3FF] text-white hover:bg-[#008fe0]"
             >
               Replay Animation ↺
             </Button>
-            <Link href="/" className="inline-flex items-center justify-center rounded-control border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-              Go to Home
-            </Link>
+            <Button asChild variant="secondary" size="lg">
+              <Link href="/">Go to Home</Link>
+            </Button>
           </div>
         </div>
       </div>

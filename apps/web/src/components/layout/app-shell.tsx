@@ -27,6 +27,7 @@ import { useSessionUser, useSignOut } from '@/providers/session-provider';
 import { useIsClient, useOnChange, useStoredFlag } from '@/lib/hooks';
 import { cn, initials } from '@/lib/utils';
 import { CITIZEN_TOP_NAV, isActive, navForRole, type NavGroup, type NavItem } from './nav-config';
+import { BottomNav } from './bottom-nav';
 
 const COLLAPSE_KEY = 'fmc.sidebar.collapsed';
 
@@ -93,7 +94,7 @@ function UserMenu({ nameFrom = 'md' }: { nameFrom?: 'md' | '2xl' }) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex h-11 items-center gap-2.5 rounded-control pl-1 pr-1.5 text-left transition-colors hover:bg-surface-2" aria-label="Account menu">
-          <span className="grid h-8 w-8 place-items-center rounded-full bg-[#13234a] text-xs font-bold text-[#e9eef7]">{initials(user.name)}</span>
+          <span className="grid h-8 w-8 place-items-center rounded-full bg-console text-xs font-bold text-console-fg">{initials(user.name)}</span>
           <span className={cn('hidden min-w-0', nameFrom === 'md' ? 'md:block' : '2xl:block')}>
             <span className="block max-w-[140px] truncate text-[13px] font-semibold leading-tight text-fg">{user.name}</span>
             <span className="block text-xs leading-tight text-fg-subtle">{ROLE_LABELS[user.role]}</span>
@@ -156,7 +157,7 @@ function MobileDrawer({ open, onOpenChange, groups, home, label, console: inCons
         {open && (
           <DialogPrimitive.Portal forceMount>
             <DialogPrimitive.Overlay asChild forceMount>
-              <motion.div className="fixed inset-0 z-50 bg-[#060b17]/55" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
+              <motion.div className="fixed inset-0 z-50 bg-[#172322]/50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
             </DialogPrimitive.Overlay>
             <DialogPrimitive.Content asChild forceMount>
               <motion.div
@@ -213,7 +214,7 @@ function CitizenShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="sticky top-0 z-30 border-b border-line bg-bg-elevated backdrop-blur-md">
+      <header className="sticky top-0 z-30 border-b border-line bg-surface">
         <div className="container-page flex h-16 items-center justify-between gap-4">
           <div className="flex items-center gap-1.5">
             <Button variant="ghost" size="icon" className="-ml-2 xl:hidden" aria-label="Open menu" onClick={() => setMobileOpen(true)}>
@@ -251,9 +252,10 @@ function CitizenShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       <MobileDrawer open={mobileOpen} onOpenChange={setMobileOpen} groups={groups} home="/dashboard" label="Citizen portal" />
-      <main id="main" className="flex-1">
-        <div className="container-page py-8 lg:py-10">{children}</div>
+      <main id="main" className="flex-1 pb-24 xl:pb-0">
+        <div className="container-page py-6 sm:py-8 lg:py-10">{children}</div>
       </main>
+      <BottomNav />
     </div>
   );
 }
@@ -357,7 +359,7 @@ function ConsoleShell({ children }: { children: React.ReactNode }) {
       <MobileDrawer open={mobileOpen} onOpenChange={setMobileOpen} groups={groups} home={home} label={workspace} console />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b border-line bg-bg-elevated px-4 backdrop-blur-md sm:px-6">
+        <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b border-line bg-surface px-4 sm:px-6">
           <div className="flex min-w-0 items-center gap-2">
             <Button variant="ghost" size="icon" className="-ml-2 lg:hidden" aria-label="Open menu" onClick={() => setMobileOpen(true)}>
               <List size={22} />
