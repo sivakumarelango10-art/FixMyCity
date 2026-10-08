@@ -152,3 +152,46 @@ describe('role-based access', () => {
     expect(allowed.status).toBe(201);
   });
 });
+
+describe('oauth synchronization', () => {
+  it('creates a new citizen account and establishes fmc_session', async () => {
+    const res = await request(app)
+      .post('/api/auth/oauth/sync')
+      .send({
+        accessToken: 'test-token-google-user',
+        email: 'google.citizen@example.com',
+        name: 'Google Citizen',
+        avatarUrl: 'https://example.com/avatar.jpg',
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.user.email).toBe('google.citizen@example.com');
+    expect(res.body.data.user.role).toBe('CITIZEN');
+    expect(res.body.data.sessionToken).toBeDefined();
+
+    // Verify Set-Cookie header contains fmc_session
+    const cookies = res.headers['set-cookie'] as string[] | undefined;
+    expect(cookies?.some((c) => c.includes('fmc_session='))).toBe(true);
+
+    // Verify user can immediately query /api/auth/me with session
+    const meRes = await request(app)
+      .get('/api/auth/me')
+      .set('Cookie', `fmc_session=${res.body.data.sessionToken}`);
+    expect(meRes.status).toBe(200);
+    expect(meRes.body.data.email).toBe('google.citizen@example.com');
+  });
+
+  it('links an existing user account and returns existing role', async () => {
+    const res = await request(app)
+      .post('/api/auth/oauth/sync')
+      .send({
+        accessToken: 'test-token-admin',
+        email: 'admin@demo.fixmycity.local',
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.user.email).toBe('admin@demo.fixmycity.local');
+    expect(res.body.data.user.role).toBe('ADMIN');
+  });
+});
+

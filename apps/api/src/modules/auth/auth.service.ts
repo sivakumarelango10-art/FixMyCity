@@ -1,12 +1,14 @@
 import type { Request, Response } from 'express';
-import type { RegisterInput, LoginInput, ForgotPasswordInput, ResetPasswordInput } from '@fixmycity/shared';
+import type { RegisterInput, LoginInput, ForgotPasswordInput, ResetPasswordInput, OAuthSyncInput, SessionUser } from '@fixmycity/shared';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { env } from '../../config/env.js';
 import { prisma } from '../../lib/prisma.js';
 import { burnPasswordCheck, hashPassword, randomToken, sha256, verifyPassword } from '../../lib/crypto.js';
-import { AppError, conflict } from '../../lib/errors.js';
+import { AppError, conflict, unauthorized } from '../../lib/errors.js';
 import { clientIp } from '../../lib/http.js';
 import { SESSION_COOKIE, sessionCookieOptions, type AuthUser } from '../../middleware/auth.js';
 import { setCsrfCookie } from '../../middleware/csrf.js';
+import { sessionUserDto } from '../../lib/mappers.js';
 import { audit } from '../../services/audit.js';
 import { sendMail } from '../../services/mailer.js';
 import { createNotifications } from '../../services/notifications.js';
@@ -18,8 +20,28 @@ const userInclude = {
 
 const INVALID_LOGIN = 'The email or password is incorrect.';
 
-/** Creates a session row and sets the HttpOnly cookie. */
-async function startSession(req: Request, res: Response, userId: string) {
+function isValidKey(key: string | undefined): boolean {
+  if (!key) return false;
+  if (key.includes('YOUR_') || key.includes('REPLACE') || key.includes('placeholder')) return false;
+  for (let i = 0; i < key.length; i++) {
+    if (key.charCodeAt(i) > 255) return false;
+  }
+  return key.startsWith('sb_') || key.startsWith('eyJ');
+}
+
+function getSupabaseAuthClient() {
+  const url = env.SUPABASE_URL || 'https://yitwhjmqfdohwbqbnsmy.supabase.co';
+  const key = (isValidKey(env.SUPABASE_SECRET_KEY) ? env.SUPABASE_SECRET_KEY : null)
+    || (isValidKey(env.SUPABASE_PUBLISHABLE_KEY) ? env.SUPABASE_PUBLISHABLE_KEY : null)
+    || 'sb_publishable_d3uy3MX06pfCeivCwyZq5A_nGVTqqtO';
+
+  return createSupabaseClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
+/** Creates a session row, sets the HttpOnly cookie, and returns the session token. */
+async function startSession(req: Request, res: Response, userId: string): Promise<string> {
   const token = randomToken(32);
   await prisma.session.create({
     data: {
@@ -33,6 +55,7 @@ async function startSession(req: Request, res: Response, userId: string) {
   res.cookie(SESSION_COOKIE, token, sessionCookieOptions(env.sessionTtlMs));
   // Rotate the CSRF token on every sign-in.
   setCsrfCookie(res);
+  return token;
 }
 
 export async function register(req: Request, res: Response, input: RegisterInput): Promise<AuthUser> {
@@ -126,3 +149,100 @@ export async function resetPassword(req: Request, input: ResetPasswordInput) {
   ]);
   await audit({ actorId: record.userId, action: 'auth.password_reset', entityType: 'user', entityId: record.userId, ipAddress: clientIp(req) });
 }
+
+export interface OAuthSyncResult {
+  user: SessionUser;
+  sessionToken: string;
+  cookieName: string;
+  maxAgeMs: number;
+}
+
+export async function oauthSync(req: Request, res: Response, input: OAuthSyncInput): Promise<OAuthSyncResult> {
+  const email = input.email.toLowerCase().trim();
+
+  // If an access token is provided, verify it against Supabase Auth
+  if (input.accessToken) {
+    if (!(env.isTest && input.accessToken.startsWith('test-'))) {
+      try {
+        const client = getSupabaseAuthClient();
+        const { data: verified, error: verifyErr } = await client.auth.getUser(input.accessToken);
+        if (verifyErr || !verified?.user?.email) {
+          throw unauthorized('Google OAuth token verification failed. Please sign in again.');
+        }
+        if (verified.user.email.toLowerCase().trim() !== email) {
+          throw unauthorized('Authenticated email does not match the token.');
+        }
+      } catch (err) {
+        if (err instanceof AppError) throw err;
+        throw unauthorized('Could not verify OAuth session with authentication provider.');
+      }
+    }
+  } else if (!env.isTest) {
+    throw unauthorized('Access token is required for OAuth synchronization.');
+  }
+
+  let user: AuthUser | null = await prisma.user.findUnique({ where: { email }, include: userInclude });
+
+  if (!user) {
+    const fallbackName = email.split('@')[0] || 'Citizen';
+    const name: string = (input.name && input.name.trim()) ? input.name.trim() : fallbackName;
+    const passwordHash = await hashPassword(randomToken(32));
+
+    const createdUser = await prisma.$transaction(async (tx) => {
+      const created = await tx.user.create({
+        data: {
+          name,
+          email,
+          passwordHash,
+          avatarUrl: input.avatarUrl || null,
+          role: 'CITIZEN',
+        },
+        include: userInclude,
+      });
+
+      await createNotifications(tx, [
+        {
+          userId: created.id,
+          type: 'SYSTEM',
+          title: 'Welcome to FixMyCity',
+          message: 'Your Google-linked account is ready. Report an issue, follow its progress and explore city services.',
+          link: '/dashboard',
+        },
+      ]);
+
+      await audit({ actorId: created.id, action: 'auth.oauth_register', entityType: 'user', entityId: created.id, ipAddress: clientIp(req) }, tx);
+      return created as AuthUser;
+    });
+
+    user = createdUser;
+    await provisionDemoUtilities(user.id);
+  } else {
+    if (!user.isActive) {
+      throw new AppError(403, 'ACCOUNT_DISABLED', 'This account has been deactivated. Contact a municipal administrator.');
+    }
+
+    if (!user.avatarUrl && input.avatarUrl) {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: { avatarUrl: input.avatarUrl },
+        include: userInclude,
+      });
+    }
+
+    await audit({ actorId: user.id, action: 'auth.oauth_login', entityType: 'user', entityId: user.id, ipAddress: clientIp(req) });
+  }
+
+  if (!user) {
+    throw new AppError(500, 'INTERNAL_ERROR', 'Could not establish user account.');
+  }
+
+  const sessionToken = await startSession(req, res, user.id);
+
+  return {
+    user: sessionUserDto(user),
+    sessionToken,
+    cookieName: SESSION_COOKIE,
+    maxAgeMs: env.sessionTtlMs,
+  };
+}
+

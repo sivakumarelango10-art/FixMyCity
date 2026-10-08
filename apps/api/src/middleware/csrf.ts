@@ -30,6 +30,11 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction) 
 
   if (SAFE_METHODS.has(req.method)) return next();
 
+  // Exclude OAuth synchronization callback which is authenticated by cryptographic bearer token
+  if (req.path === '/auth/oauth/sync' || req.path === '/api/auth/oauth/sync') {
+    return next();
+  }
+
   const origin = req.get('origin');
   if (origin && !env.webOrigins.includes(origin)) {
     return next(new AppError(403, 'BAD_ORIGIN', 'Request origin is not allowed.'));

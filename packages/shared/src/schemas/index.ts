@@ -82,6 +82,16 @@ export const changePasswordSchema = z.object({
 });
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 
+export const oauthSyncSchema = z.object({
+  accessToken: z.string().min(1, 'Access token is required.').optional(),
+  email: emailSchema,
+  name: z.string().max(120).optional(),
+  avatarUrl: z.string().max(1000).optional().nullable(),
+  provider: z.string().max(50).default('google'),
+  providerId: z.string().max(200).optional(),
+});
+export type OAuthSyncInput = z.infer<typeof oauthSyncSchema>;
+
 /* ------------------------------------------------------------------ */
 /* Complaints                                                          */
 /* ------------------------------------------------------------------ */

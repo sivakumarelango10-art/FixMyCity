@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { forgotPasswordSchema, loginSchema, registerSchema, resetPasswordSchema } from '@fixmycity/shared';
+import { forgotPasswordSchema, loginSchema, registerSchema, resetPasswordSchema, oauthSyncSchema } from '@fixmycity/shared';
 import { ok, parse } from '../../lib/http.js';
 import { signRealtimeToken } from '../../lib/crypto.js';
 import { sessionUserDto } from '../../lib/mappers.js';
@@ -17,6 +17,12 @@ export async function login(req: Request, res: Response) {
   const input = parse(loginSchema, req.body);
   const user = await service.login(req, res, input);
   ok(res, sessionUserDto(user));
+}
+
+export async function oauthSync(req: Request, res: Response) {
+  const input = parse(oauthSyncSchema, req.body);
+  const result = await service.oauthSync(req, res, input);
+  ok(res, result);
 }
 
 export async function logout(req: Request, res: Response) {

@@ -8,6 +8,7 @@ export const authRouter = Router();
 authRouter.get('/csrf', controller.csrf);
 authRouter.post('/register', authLimiter, controller.register);
 authRouter.post('/login', authLimiter, controller.login);
+authRouter.post('/oauth/sync', authLimiter, controller.oauthSync);
 authRouter.post('/logout', controller.logout);
 authRouter.get('/me', requireAuth, controller.me);
 authRouter.get('/socket-token', requireAuth, controller.socketToken);

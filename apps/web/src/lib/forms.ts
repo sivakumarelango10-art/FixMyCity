@@ -1,4 +1,5 @@
 import type { FieldValues, Path, UseFormSetError } from 'react-hook-form';
+import { homePathForRole, type Role } from '@fixmycity/shared';
 import { ApiError } from './api';
 
 /**
@@ -22,3 +23,13 @@ export function safeNext(next: string | null | undefined, fallback: string): str
   if (!next || !next.startsWith('/') || next.startsWith('//') || next.startsWith('/\\')) return fallback;
   return next;
 }
+
+/** Keeps users inside the workspace their role is allowed to open. */
+export function destinationFor(role: Role, next: string | null | undefined): string {
+  const home = homePathForRole(role);
+  const target = safeNext(next, home);
+  const area = target.split('/')[1] ?? '';
+  const allowed = role === 'CITIZEN' ? ['dashboard'] : role === 'DEPARTMENT_OFFICER' ? ['department'] : ['admin'];
+  return allowed.includes(area) ? target : home;
+}
+

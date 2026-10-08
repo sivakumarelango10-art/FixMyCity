@@ -36,6 +36,9 @@ const envSchema = z.object({
   SUPABASE_SECRET_KEY: z.string().optional(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
   SUPABASE_KEY: z.string().optional(),
+  SUPABASE_PUBLISHABLE_KEY: z.string().optional(),
+  NEXT_PUBLIC_SUPABASE_URL: z.string().optional(),
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().optional(),
   SUPABASE_STORAGE_BUCKET: z.string().default('complaint-photos'),
 
   // AI Classification (Gemini & Anthropic)
@@ -61,10 +64,13 @@ if (!parsed.success) {
 
 const raw = parsed.data;
 
+const resolvedSupabaseUrl = raw.SUPABASE_URL || raw.NEXT_PUBLIC_SUPABASE_URL || 'https://yitwhjmqfdohwbqbnsmy.supabase.co';
 const resolvedSupabaseKey = raw.SUPABASE_SECRET_KEY || raw.SUPABASE_SERVICE_ROLE_KEY || raw.SUPABASE_KEY;
+const resolvedSupabasePublishableKey = raw.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || raw.SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_d3uy3MX06pfCeivCwyZq5A_nGVTqqtO';
+
 const resolvedGeminiKey = raw.GEMINI_API_KEY || raw.GOOGLE_API_KEY;
 const resolvedStorageDriver =
-  raw.STORAGE_DRIVER === 'supabase' || (raw.STORAGE_DRIVER !== 's3' && Boolean(raw.SUPABASE_URL && resolvedSupabaseKey))
+  raw.STORAGE_DRIVER === 'supabase' || (raw.STORAGE_DRIVER !== 's3' && Boolean(resolvedSupabaseUrl && resolvedSupabaseKey))
     ? ('supabase' as const)
     : raw.STORAGE_DRIVER;
 
@@ -79,8 +85,10 @@ const resolvedAiProvider =
 
 export const env = {
   ...raw,
+  SUPABASE_URL: resolvedSupabaseUrl,
   STORAGE_DRIVER: resolvedStorageDriver,
   SUPABASE_SECRET_KEY: resolvedSupabaseKey,
+  SUPABASE_PUBLISHABLE_KEY: resolvedSupabasePublishableKey,
   GEMINI_API_KEY: resolvedGeminiKey,
   AI_PROVIDER: resolvedAiProvider,
   isProduction: raw.NODE_ENV === 'production',

@@ -29,9 +29,11 @@ export function GoogleIcon({ className }: { className?: string }) {
 
 export function GoogleAuthButton({
   mode = 'signin',
+  next,
   onError,
 }: {
   mode?: 'signin' | 'signup';
+  next?: string | null;
   onError?: (msg: string) => void;
 }) {
   const [loading, setLoading] = React.useState(false);
@@ -40,7 +42,8 @@ export function GoogleAuthButton({
     try {
       setLoading(true);
       const supabase = createClient();
-      const redirectUrl = `${window.location.origin}/auth/callback?next=/dashboard`;
+      const targetNext = next || (mode === 'signup' ? '/dashboard?welcome=1' : '/dashboard');
+      const redirectUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(targetNext)}`;
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',

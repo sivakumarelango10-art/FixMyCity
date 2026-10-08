@@ -15,7 +15,7 @@ import { Notice } from '@/components/ui/primitives';
 import { GoogleAuthButton } from '@/components/auth/google-button';
 import { api } from '@/lib/api';
 
-import { applyServerErrors, safeNext } from '@/lib/forms';
+import { applyServerErrors, destinationFor, safeNext } from '@/lib/forms';
 
 /** Development / demo-mode helper. Never enabled in a production build unless explicitly opted in. */
 const SHOW_DEMO = process.env.NODE_ENV !== 'production' || process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
@@ -26,15 +26,6 @@ const DEMO_ACCOUNTS: { role: Role; email: string; password: string; note?: strin
   { role: 'DEPARTMENT_OFFICER', email: 'water.officer@demo.fixmycity.local', password: 'Officer@2026', note: 'Water Supply' },
 ];
 
-/** Keeps users inside the workspace their role is allowed to open. */
-function destinationFor(role: Role, next: string | null) {
-  const home = homePathForRole(role);
-  const target = safeNext(next, home);
-  const area = target.split('/')[1] ?? '';
-  const allowed = role === 'CITIZEN' ? ['dashboard'] : role === 'DEPARTMENT_OFFICER' ? ['department'] : ['admin'];
-  return allowed.includes(area) ? target : home;
-}
-
 export function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
@@ -43,7 +34,18 @@ export function LoginForm() {
   const form = useForm<LoginInput>({ resolver: zodResolver(loginSchema), defaultValues: { email: '', password: '' } });
   const { register, handleSubmit, setValue, formState } = form;
 
-  const notice = params.get('expired') ? 'Your session has ended. Please sign in again.' : params.get('signedOut') ? 'You have been signed out.' : params.get('reset') ? 'Password updated. Sign in with your new password.' : null;
+  const oauthError = params.get('error');
+  const notice = params.get('expired')
+    ? 'Your session has ended. Please sign in again.'
+    : params.get('signedOut')
+      ? 'You have been signed out.'
+      : params.get('reset')
+        ? 'Password updated. Sign in with your new password.'
+        : oauthError
+          ? oauthError === 'oauth_failed'
+            ? 'Google sign-in could not be completed. Please try again or sign in with your password.'
+            : decodeURIComponent(oauthError)
+          : null;
 
   const onSubmit = handleSubmit(async (values) => {
     setFormError(null);
@@ -67,7 +69,7 @@ export function LoginForm() {
       {notice && <Notice title={notice} />}
 
       <div className="grid gap-4">
-        <GoogleAuthButton mode="signin" onError={setFormError} />
+        <GoogleAuthButton mode="signin" next={params.get('next')} onError={setFormError} />
         <div className="relative flex items-center justify-center my-1">
           <div className="w-full border-t border-line"></div>
           <span className="bg-bg px-3 text-xs uppercase tracking-wider text-fg-subtle">or continue with email</span>

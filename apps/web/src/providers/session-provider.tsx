@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import type { SessionUser } from '@fixmycity/shared';
 import { api, ApiError } from '@/lib/api';
 import { qk } from '@/lib/query-keys';
+import { createClient } from '@/utils/supabase/client';
 
 const SessionContext = React.createContext<SessionUser | null>(null);
 
@@ -46,6 +47,12 @@ export function useSignOut() {
     try {
       await api.post('/api/auth/logout');
     } finally {
+      try {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+      } catch {
+        // ignore
+      }
       qc.clear();
       router.replace('/login?signedOut=1');
       router.refresh();
