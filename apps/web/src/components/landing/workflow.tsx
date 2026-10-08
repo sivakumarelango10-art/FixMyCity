@@ -1,55 +1,62 @@
 'use client';
 
 import { motion, useReducedMotion } from 'motion/react';
-import { Camera, CheckCircle, ListMagnifyingGlass, Signpost, Sparkle, type Icon } from '@phosphor-icons/react';
+import { REOPEN_WINDOW_DAYS, STATUS_LABELS, STATUS_PROGRESSION, type ComplaintStatus } from '@fixmycity/shared';
+import { STATUS_ICONS } from '@/components/common/complaint-meta';
 import { Reveal } from '@/components/motion/reveal';
 
-const STEPS: { icon: Icon; title: string; body: string }[] = [
-  { icon: Camera, title: 'Report', body: 'Describe the issue, add a photo and drop a pin on the map.' },
-  { icon: Sparkle, title: 'Analyze', body: 'A classifier suggests category, department and priority, clearly labeled as a suggestion.' },
-  { icon: Signpost, title: 'Assign', body: 'An administrator reviews the report and routes it to the right department.' },
-  { icon: CheckCircle, title: 'Resolve', body: 'Officers record progress notes and the resolution on the record.' },
-  { icon: ListMagnifyingGlass, title: 'Track', body: 'You follow every status change on a timeline, with alerts as it moves.' },
-];
+/* What actually happens at each station, and who acts. Mirrors the API workflow. */
+const STOPS: Partial<Record<ComplaintStatus, { who: string; body: string }>> = {
+  SUBMITTED: { who: 'You', body: 'Describe the problem, add a photo and pin it. You get a tracking ID and a suggested category straight away.' },
+  ASSIGNED: { who: 'Municipal administrator', body: 'Reviews the report, accepts or overrides the suggestion and routes it to the responsible department.' },
+  IN_PROGRESS: { who: 'Department officer', body: 'Starts work on site and posts progress updates that appear on your timeline.' },
+  RESOLVED: { who: 'Department, then you', body: `Records what was fixed, with photos. You rate the result or reopen it within ${REOPEN_WINDOW_DAYS} days.` },
+};
 
 export function Workflow() {
   const reduce = useReducedMotion();
   return (
-    <section id="how-it-works" className="scroll-mt-20 border-y border-line bg-surface/40 py-20 lg:py-28">
-      <div className="container-page grid gap-14">
+    <section id="how-it-works" className="scroll-mt-20 border-y border-line bg-surface py-16 md:py-24">
+      <div className="container-page grid gap-12 md:gap-16">
         <Reveal className="grid max-w-2xl gap-4">
-          <p className="text-[13px] font-bold uppercase tracking-[0.16em] text-accent">How it works</p>
-          <h2 className="text-3xl font-extrabold tracking-[-0.03em] text-fg md:text-[2.75rem] md:leading-[1.08]">From report to resolution in five steps.</h2>
+          <h2 className="type-section text-fg">From report to resolution, on one visible route.</h2>
+          <p className="type-lead">Every report travels the same four stops. You see each one the moment it happens.</p>
         </Reveal>
 
-        <ol className="relative grid gap-8 lg:grid-cols-5 lg:gap-6">
-          {/* Connecting rail draws in as the section enters, mirroring the order of the steps. */}
+        <ol className="relative grid gap-10 md:grid-cols-4 md:gap-6" aria-label="How a report moves">
+          {/* The route line draws in as the section enters: the order of the stops is the story. */}
+          <span aria-hidden className="absolute bottom-6 left-[19px] top-5 w-1 rounded-full bg-surface-3 md:bottom-auto md:left-5 md:right-[calc(25%-38px)] md:top-[18px] md:h-1 md:w-auto" />
           <motion.span
             aria-hidden
-            className="absolute left-[22px] top-0 h-full w-px origin-top bg-gradient-to-b from-accent via-accent/50 to-transparent lg:left-0 lg:top-[22px] lg:h-px lg:w-full lg:origin-left lg:bg-gradient-to-r"
+            className="absolute bottom-6 left-[19px] top-5 w-1 origin-top rounded-full bg-accent md:bottom-auto md:left-5 md:right-[calc(25%-38px)] md:top-[18px] md:h-1 md:w-auto md:origin-left"
             initial={reduce ? false : { scaleX: 0, scaleY: 0 }}
             whileInView={{ scaleX: 1, scaleY: 1 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
           />
-          {STEPS.map(({ icon: Icon, title, body }, i) => (
-            <motion.li
-              key={title}
-              className="relative grid grid-cols-[44px_1fr] gap-4 lg:grid-cols-1"
-              initial={reduce ? false : { opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.4 }}
-              transition={{ duration: 0.6, delay: 0.15 + i * 0.12, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <span className="relative z-10 grid h-11 w-11 place-items-center rounded-[14px] border border-accent-line bg-bg text-accent">
-                <Icon size={22} weight="bold" />
-              </span>
-              <div className="grid gap-1.5">
-                <h3 className="text-lg font-extrabold text-fg">{title}</h3>
-                <p className="text-sm leading-relaxed text-fg-muted">{body}</p>
-              </div>
-            </motion.li>
-          ))}
+          {STATUS_PROGRESSION.map((s: ComplaintStatus, i) => {
+            const Icon = STATUS_ICONS[s];
+            const stop = STOPS[s]!;
+            return (
+              <motion.li
+                key={s}
+                className="relative grid grid-cols-[40px_1fr] gap-4 md:grid-cols-1 md:gap-5"
+                initial={reduce ? false : { opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.5, delay: 0.15 + i * 0.12, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <span className="relative z-10 grid h-10 w-10 place-items-center rounded-full border-4 border-surface bg-accent text-accent-fg">
+                  <Icon size={17} weight="bold" aria-hidden />
+                </span>
+                <div className="grid gap-1.5 md:pr-4">
+                  <h3 className="text-lg font-semibold tracking-[-0.015em] text-fg">{STATUS_LABELS[s]}</h3>
+                  <p className="text-[13px] font-semibold text-accent-text">{stop.who}</p>
+                  <p className="text-[15px] leading-relaxed text-fg-muted">{stop.body}</p>
+                </div>
+              </motion.li>
+            );
+          })}
         </ol>
       </div>
     </section>

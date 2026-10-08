@@ -1,28 +1,52 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
-/** Geometric mark: four city blocks on a grid, one lit in the accent color. */
+/**
+ * Brand mark: circular pin with urban skyline and roadway.
+ */
 export function LogoMark({ className, size = 28 }: { className?: string; size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden className={className}>
-      <rect x="1" y="1" width="30" height="30" rx="9" fill="var(--surface-3)" stroke="var(--line-strong)" />
-      <rect x="7" y="7" width="8" height="8" rx="2.5" fill="var(--fg-muted)" opacity="0.55" />
-      <rect x="17" y="7" width="8" height="8" rx="2.5" fill="var(--accent)" />
-      <rect x="7" y="17" width="8" height="8" rx="2.5" fill="var(--fg-muted)" opacity="0.55" />
-      <rect x="17" y="17" width="8" height="8" rx="2.5" fill="var(--fg-muted)" opacity="0.55" />
-    </svg>
+    <Image
+      src="/brand/logo-mark.png"
+      alt="FixMyCity"
+      width={size}
+      height={size}
+      className={cn('shrink-0 object-contain', className)}
+      priority
+    />
+  );
+}
+
+export function Wordmark({ className }: { className?: string }) {
+  return (
+    <span className={cn('text-[17px] font-bold tracking-[-0.02em] text-fg [font-variation-settings:"wdth"_108]', className)}>
+      Fix<span className="text-accent-text">My</span>
+      <span className="text-brand-teal">City</span>
+    </span>
   );
 }
 
 export function Logo({ href = '/', className, compact }: { href?: string; className?: string; compact?: boolean }) {
   return (
-    <Link href={href} className={cn('inline-flex items-center gap-2.5 rounded-lg', className)} aria-label="FixMyCity home">
-      <LogoMark />
-      {!compact && (
-        <span className="text-[17px] font-extrabold tracking-tight text-fg">
-          FixMy<span className="text-accent">City</span>
-        </span>
-      )}
+    <Link href={href} className={cn('inline-flex items-center gap-2.5 rounded-control group', className)} aria-label="FixMyCity home">
+      <LogoMark size={32} />
+      {!compact && <Wordmark />}
+    </Link>
+  );
+}
+
+export function FullLogo({ className, height = 36, href = '/' }: { className?: string; height?: number; href?: string }) {
+  return (
+    <Link href={href} className={cn('inline-flex items-center', className)} aria-label="FixMyCity home">
+      <Image
+        src="/brand/logo.png"
+        alt="FixMyCity"
+        width={Math.round(height * (783 / 644))}
+        height={height}
+        className={cn('object-contain', className)}
+        priority
+      />
     </Link>
   );
 }

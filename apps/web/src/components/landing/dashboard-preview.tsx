@@ -46,12 +46,12 @@ export function DashboardPreview() {
   const [view, setView] = React.useState<(typeof VIEWS)[number]['id']>('citizen');
   const active = VIEWS.find((v) => v.id === view)!;
   return (
-    <section className="border-y border-line bg-surface/40 py-20 lg:py-28">
+    <section className="py-16 md:py-24">
       <div className="container-page grid gap-10">
         <Reveal className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
           <div className="grid max-w-2xl gap-4">
-            <h2 className="text-3xl font-extrabold tracking-[-0.03em] text-fg md:text-[2.75rem] md:leading-[1.08]">Every role gets its own workspace.</h2>
-            <p className="text-lg leading-relaxed text-fg-muted" aria-live="polite">
+            <h2 className="type-section text-fg">Every role gets its own workspace.</h2>
+            <p className="type-lead" aria-live="polite">
               {active.caption}
             </p>
           </div>
@@ -66,8 +66,8 @@ export function DashboardPreview() {
           </Tabs>
         </Reveal>
         <Reveal delay={0.1}>
-          <figure className="group panel overflow-hidden p-1.5 transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:shadow-[var(--shadow-pop)]">
-            <div className="relative aspect-[16/10] overflow-hidden rounded-[14px] bg-surface-2">
+          <figure className="panel overflow-hidden p-2">
+            <div className="relative aspect-[16/10] overflow-hidden rounded-control border border-line bg-surface-2">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={active.id}
@@ -75,7 +75,7 @@ export function DashboardPreview() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                  className="absolute inset-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.012]"
+                  className="absolute inset-0"
                 >
                   {(['dark', 'light'] as const).map((theme) => (
                     <Image
@@ -91,7 +91,7 @@ export function DashboardPreview() {
                 </motion.div>
               </AnimatePresence>
             </div>
-            <figcaption className="px-3 pb-1.5 pt-3 text-[13px] text-fg-subtle">
+            <figcaption className="px-2 pb-1 pt-3 text-caption text-fg-subtle">
               Screenshot of the running app with fictional demo data.
             </figcaption>
           </figure>

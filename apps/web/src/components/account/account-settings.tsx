@@ -200,7 +200,7 @@ function SessionsPanel() {
             ))}
           </ul>
         )}
-        <Button variant="outline" className="w-fit border-danger/40 text-danger hover:bg-danger-soft" onClick={() => setConfirm(true)}>
+        <Button variant="danger-quiet" className="w-fit" onClick={() => setConfirm(true)}>
           <SignOut size={16} /> Sign out of this device
         </Button>
       </div>

@@ -8,9 +8,9 @@ import { cn } from '@/lib/utils';
 import { Button } from './button';
 
 const overlay =
-  'fixed inset-0 z-50 bg-[#050817]/60 backdrop-blur-[2px] data-[state=open]:animate-[fade-in_180ms_ease-out] data-[state=closed]:animate-[fade-out_140ms_ease-in]';
+  'fixed inset-0 z-50 bg-[#060b17]/55 data-[state=open]:animate-[fade-in_180ms_ease-out] data-[state=closed]:animate-[fade-out_140ms_ease-in]';
 const content =
-  'fixed left-1/2 top-1/2 z-50 grid w-[calc(100vw-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-5 rounded-[var(--radius-panel)] border border-line bg-surface p-6 shadow-[var(--shadow-pop)] max-h-[calc(100dvh-2rem)] overflow-y-auto data-[state=open]:animate-[dialog-in_220ms_cubic-bezier(0.16,1,0.3,1)] data-[state=closed]:animate-[dialog-out_140ms_ease-in]';
+  'fixed left-1/2 top-1/2 z-50 grid w-[calc(100vw-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-5 rounded-panel border border-line bg-surface-elevated p-5 shadow-[var(--shadow-pop)] sm:p-6 max-h-[calc(100dvh-2rem)] overflow-y-auto data-[state=open]:animate-[dialog-in_220ms_cubic-bezier(0.16,1,0.3,1)] data-[state=closed]:animate-[dialog-out_140ms_ease-in]';
 
 export const Dialog = DialogPrimitive.Root;
 export const DialogTrigger = DialogPrimitive.Trigger;
@@ -29,7 +29,7 @@ export function DialogContent({
       <DialogPrimitive.Content className={cn(content, className)} {...props} aria-describedby={description ? undefined : undefined}>
         <div className="flex items-start justify-between gap-4">
           <div className="grid gap-1.5">
-            <DialogPrimitive.Title className="text-lg font-bold tracking-tight text-fg">{title}</DialogPrimitive.Title>
+            <DialogPrimitive.Title className="text-lg font-semibold tracking-[-0.015em] text-fg">{title}</DialogPrimitive.Title>
             {description ? (
               <DialogPrimitive.Description className="text-sm leading-relaxed text-fg-muted">{description}</DialogPrimitive.Description>
             ) : (
@@ -37,8 +37,8 @@ export function DialogContent({
             )}
           </div>
           <DialogPrimitive.Close asChild>
-            <Button variant="ghost" size="icon-sm" aria-label="Close dialog">
-              <X size={16} />
+            <Button variant="ghost" size="icon-sm" aria-label="Close dialog" className="-mr-1.5 -mt-1.5">
+              <X size={18} />
             </Button>
           </DialogPrimitive.Close>
         </div>
@@ -68,7 +68,7 @@ export function ConfirmDialog({ open, onOpenChange, title, description, confirmL
         <AlertPrimitive.Overlay className={overlay} />
         <AlertPrimitive.Content className={content}>
           <div className="grid gap-1.5">
-            <AlertPrimitive.Title className="text-lg font-bold tracking-tight text-fg">{title}</AlertPrimitive.Title>
+            <AlertPrimitive.Title className="text-lg font-semibold tracking-[-0.015em] text-fg">{title}</AlertPrimitive.Title>
             <AlertPrimitive.Description className="text-sm leading-relaxed text-fg-muted">{description}</AlertPrimitive.Description>
           </div>
           {children}

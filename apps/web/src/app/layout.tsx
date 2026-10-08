@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from 'next';
-import { JetBrains_Mono, Plus_Jakarta_Sans } from 'next/font/google';
+import { JetBrains_Mono, Mona_Sans } from 'next/font/google';
 import { AppProviders } from '@/providers/app-providers';
 import '@/styles/globals.css';
 
-const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-jakarta', display: 'swap' });
+// Mona Sans: one variable family for display, interface and dense data (weight and width axes).
+const mona = Mona_Sans({ subsets: ['latin'], variable: '--font-mona', display: 'swap', axes: ['wdth'] });
 const jetbrains = JetBrains_Mono({ subsets: ['latin'], variable: '--font-jetbrains', display: 'swap', weight: ['400', '500'] });
 
 export const metadata: Metadata = {
@@ -24,8 +25,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#080d24' },
-    { media: '(prefers-color-scheme: light)', color: '#f4f6fb' },
+    { media: '(prefers-color-scheme: dark)', color: '#0a1020' },
+    { media: '(prefers-color-scheme: light)', color: '#f4f4f1' },
   ],
   width: 'device-width',
   initialScale: 1,
@@ -33,11 +34,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${jakarta.variable} ${jetbrains.variable} dark`} data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang="en" className={`${mona.variable} ${jetbrains.variable}`} data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className="min-h-dvh">
         <a
           href="#main"
-          className="sr-only z-[100] rounded-lg bg-accent px-4 py-2 font-semibold text-accent-fg focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+          className="sr-only z-[100] rounded-control bg-accent px-4 py-2.5 font-semibold text-accent-fg focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
         >
           Skip to content
         </a>

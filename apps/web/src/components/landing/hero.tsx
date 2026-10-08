@@ -3,39 +3,33 @@
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowRight } from '@phosphor-icons/react';
-import type { PublicMapComplaint, PublicStats } from '@fixmycity/shared';
+import type { PublicMapComplaint } from '@fixmycity/shared';
 import { Button } from '@/components/ui/button';
 import { IssuesMap } from '@/components/maps';
+import { MapLegend } from '@/components/maps/city-map-view';
 import { api } from '@/lib/api';
 import { qk } from '@/lib/query-keys';
 
 export function Hero() {
-  const { data: complaints = [] } = useQuery({
+  const { data: complaints = [], isLoading } = useQuery({
     queryKey: qk.publicMap({}),
     queryFn: () => api.get<PublicMapComplaint[]>('/api/public/map'),
     refetchInterval: 60_000,
   });
-  const { data: stats } = useQuery({ queryKey: qk.publicStats, queryFn: () => api.get<PublicStats>('/api/public/stats') });
 
-  // Entrance runs in CSS (.enter-up / .enter-scale) so the hero is never hidden while JS loads.
+  // Entrance runs in CSS (.enter-up) so the hero is never hidden while JS loads.
   const delay = (ms: number) => ({ '--enter-delay': `${ms}ms` }) as React.CSSProperties;
 
   return (
     <section className="relative overflow-hidden">
-      <div aria-hidden className="hairline-grid pointer-events-none absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_at_top_left,black_20%,transparent_70%)]" />
-      <div className="container-page relative grid items-center gap-12 pb-16 pt-12 md:pt-16 lg:grid-cols-[1.12fr_1fr] lg:gap-14 lg:pb-24 lg:pt-20">
-        <div className="grid max-w-[640px] gap-7">
-          <p className="enter-up text-[13px] font-bold uppercase tracking-[0.16em] text-accent">
-            One City. One Platform. Every Service.
-          </p>
-          <h1 style={delay(60)} className="enter-up text-[2.5rem] font-extrabold leading-[1.05] tracking-[-0.035em] text-fg sm:text-5xl lg:text-[2.8rem] xl:text-[3.6rem]">
-            Your City. Your Voice.
-            <br />
-            <span className="text-accent">One Platform.</span>
+      <div className="container-page grid items-center gap-10 pb-16 pt-10 sm:pt-14 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-14 lg:pb-24 lg:pt-16">
+        <div className="grid max-w-[600px] gap-6 sm:gap-7">
+          <p className="enter-up type-overline text-accent-text">One City. One Platform. Every Service.</p>
+          <h1 style={delay(60)} className="enter-up type-display text-fg">
+            <span className="block">Your City.</span> <span className="block text-accent-text">Your Voice.</span>
           </h1>
-          <p style={delay(120)} className="enter-up max-w-[46ch] text-lg leading-relaxed text-fg-muted">
-            Report civic issues, track resolutions, access urban services, and stay connected with your city, all from one intelligent
-            platform.
+          <p style={delay(120)} className="enter-up type-lead max-w-[44ch]">
+            Report problems, track progress, discover city services, and stay connected with what&apos;s happening around you.
           </p>
           <div style={delay(180)} className="enter-up flex flex-wrap gap-3">
             <Button asChild size="lg">
@@ -49,26 +43,23 @@ export function Hero() {
           </div>
         </div>
 
-        <figure style={delay(150)} className="enter-scale grid gap-3">
-          <div className="panel overflow-hidden p-1.5">
+        <figure style={delay(140)} className="enter-up grid min-w-0 gap-3">
+          <div className="panel relative overflow-hidden">
             <IssuesMap
               complaints={complaints}
-              className="h-[340px] rounded-[14px] sm:h-[420px] lg:h-[480px]"
-              ariaLabel="Live map of demo civic issue reports across Bengaluru"
+              scrollZoom={false}
+              className="h-[340px] sm:h-[440px] lg:h-[520px]"
+              ariaLabel="Map of civic issue reports across the demo city"
             />
+            <div className="pointer-events-none absolute bottom-3 left-3 z-[500] hidden w-[250px] sm:block">
+              <div className="pointer-events-auto rounded-panel border border-line bg-surface-elevated/95 p-3.5 shadow-[var(--shadow-pop)] backdrop-blur-sm">
+                <p className="mb-2.5 text-xs font-semibold text-fg">{isLoading ? 'Loading reports' : 'On the map now'}</p>
+                <MapLegend items={complaints} className="[&>p]:hidden" />
+              </div>
+            </div>
           </div>
-          <figcaption className="flex flex-wrap items-center justify-between gap-2 px-1 text-[13px] text-fg-subtle">
-            <span>
-              {stats ? (
-                <>
-                  <span className="font-semibold text-fg-muted tabular">{stats.total}</span> reports on the map,{' '}
-                  <span className="font-semibold text-fg-muted tabular">{stats.resolved}</span> resolved
-                </>
-              ) : (
-                'Loading live reports'
-              )}
-            </span>
-            <span>Live demo data. Public view shows no personal details.</span>
+          <figcaption className="px-1 text-caption text-fg-subtle">
+            Live from the demo database. The public map never shows who reported an issue.
           </figcaption>
         </figure>
       </div>

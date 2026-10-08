@@ -2,10 +2,12 @@
 
 import * as React from 'react';
 import * as LabelPrimitive from '@radix-ui/react-label';
+import { WarningCircle } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
 
+/* 16px text on small screens prevents iOS from zooming into focused fields. */
 export const inputBase =
-  'w-full rounded-[var(--radius-control)] border border-line-strong bg-surface px-3.5 text-[15px] text-fg transition-[border-color,box-shadow] duration-150 hover:border-fg-subtle focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent-soft disabled:opacity-60 aria-[invalid=true]:border-danger aria-[invalid=true]:focus:ring-danger-soft';
+  'w-full rounded-control border border-line-strong bg-surface px-3.5 text-base text-fg transition-[border-color,box-shadow,background-color] duration-150 hover:border-fg-subtle focus:border-accent focus:outline-none focus:ring-[3px] focus:ring-accent-soft disabled:cursor-not-allowed disabled:bg-surface-2 disabled:opacity-70 aria-[invalid=true]:border-danger aria-[invalid=true]:focus:ring-danger-soft sm:text-[15px]';
 
 export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(({ className, ...props }, ref) => (
   <input ref={ref} className={cn(inputBase, 'h-11', className)} {...props} />
@@ -27,7 +29,7 @@ interface FieldProps {
   id: string;
   label: string;
   error?: string;
-  hint?: string;
+  hint?: React.ReactNode;
   optional?: boolean;
   className?: string;
   children: React.ReactElement<{ id?: string; 'aria-invalid'?: boolean; 'aria-describedby'?: string }>;
@@ -50,24 +52,34 @@ export function Field({ id, label, error, hint, optional, className, children, a
       </div>
       {React.cloneElement(children, { id, 'aria-invalid': error ? true : undefined, 'aria-describedby': describedBy })}
       {hint && !error && (
-        <p id={hintId} className="text-[13px] text-fg-subtle">
+        <p id={hintId} className="text-caption text-fg-subtle">
           {hint}
         </p>
       )}
-      {error && (
-        <p id={errorId} role="alert" className="text-[13px] font-medium text-danger">
-          {error}
-        </p>
-      )}
+      {error && <FieldError id={errorId}>{error}</FieldError>}
     </div>
   );
 }
 
-export function FormError({ message }: { message?: string | null }) {
+/** Inline error under a control: icon plus text, never color alone. */
+export function FieldError({ id, children, className }: { id?: string; children: React.ReactNode; className?: string }) {
+  return (
+    <p id={id} role="alert" className={cn('flex items-start gap-1.5 text-caption font-medium text-danger', className)}>
+      <WarningCircle size={15} weight="bold" className="mt-px shrink-0" aria-hidden />
+      <span>{children}</span>
+    </p>
+  );
+}
+
+export function FormError({ message, title }: { message?: string | null; title?: string }) {
   if (!message) return null;
   return (
-    <div role="alert" className="rounded-[var(--radius-control)] border border-danger/30 bg-danger-soft px-4 py-3 text-sm font-medium text-danger">
-      {message}
+    <div role="alert" className="flex items-start gap-3 rounded-control border border-danger/30 bg-danger-soft px-4 py-3 text-sm text-danger">
+      <WarningCircle size={18} weight="bold" className="mt-0.5 shrink-0" aria-hidden />
+      <div className="grid gap-0.5">
+        {title && <p className="font-semibold">{title}</p>}
+        <p className={title ? 'text-fg-muted' : 'font-medium'}>{message}</p>
+      </div>
     </div>
   );
 }

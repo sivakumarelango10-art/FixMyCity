@@ -1,13 +1,16 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { Skeleton } from '@/components/ui/primitives';
+import { MapTrifold } from '@phosphor-icons/react';
 import type { IssuesMapProps, LocationPickerProps } from './leaflet-maps';
 
+/** Shown while the map library loads: the map's footprint with a quiet label, never a blank box. */
 function MapSkeleton() {
   return (
-    <div className="grid h-full w-full place-items-center">
-      <Skeleton className="h-full w-full rounded-none" />
+    <div className="skeleton grid h-full w-full place-items-center rounded-none" role="status" aria-label="Loading map">
+      <span className="relative z-10 flex items-center gap-2 text-[13px] font-medium text-fg-subtle">
+        <MapTrifold size={18} aria-hidden /> Loading map
+      </span>
     </div>
   );
 }

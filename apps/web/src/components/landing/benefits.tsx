@@ -18,18 +18,14 @@ const ADMINS: { icon: Icon; title: string; body: string }[] = [
 
 function Column({ title, items, delay }: { title: string; items: typeof CITIZENS; delay: number }) {
   return (
-    <Reveal delay={delay} className="grid content-start gap-6">
-      <h3 className="text-xl font-extrabold text-fg">{title}</h3>
-      <ul className="grid gap-5">
+    <Reveal delay={delay} className="grid content-start gap-6 border-t-2 border-fg pt-6">
+      <h3 className="text-xl font-semibold tracking-[-0.02em] text-fg">{title}</h3>
+      <ul className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
         {items.map(({ icon: Icon, title: t, body }) => (
-          <li key={t} className="grid grid-cols-[40px_1fr] gap-4">
-            <span className="grid h-10 w-10 place-items-center rounded-[12px] bg-surface-2 text-fg-muted">
-              <Icon size={20} />
-            </span>
-            <div>
-              <p className="font-bold text-fg">{t}</p>
-              <p className="text-sm leading-relaxed text-fg-muted">{body}</p>
-            </div>
+          <li key={t} className="grid content-start gap-2">
+            <Icon size={22} className="text-accent-text" aria-hidden />
+            <p className="font-semibold text-fg">{t}</p>
+            <p className="text-sm leading-relaxed text-fg-muted">{body}</p>
           </li>
         ))}
       </ul>
@@ -39,14 +35,12 @@ function Column({ title, items, delay }: { title: string; items: typeof CITIZENS
 
 export function Benefits() {
   return (
-    <section className="py-20 lg:py-28">
-      <div className="container-page grid gap-14">
+    <section className="py-16 md:py-24">
+      <div className="container-page grid gap-12">
         <Reveal className="grid max-w-2xl gap-4">
-          <h2 className="text-3xl font-extrabold tracking-[-0.03em] text-fg md:text-[2.75rem] md:leading-[1.08]">
-            Built for residents and the people who serve them.
-          </h2>
+          <h2 className="type-section text-fg">Built for residents and the people who serve them.</h2>
         </Reveal>
-        <div className="grid gap-14 md:grid-cols-2 md:gap-10 lg:gap-20">
+        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
           <Column title="For citizens" items={CITIZENS} delay={0} />
           <Column title="For municipal teams" items={ADMINS} delay={0.1} />
         </div>

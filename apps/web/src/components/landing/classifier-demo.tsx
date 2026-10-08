@@ -9,10 +9,10 @@ import { Textarea } from '@/components/ui/field';
 import { Reveal } from '@/components/motion/reveal';
 
 const EXAMPLES = [
-  'Water pipeline burst near our street. Water has been leaking continuously.',
-  'Large pothole near MG Road affecting daily commuters.',
-  'Streetlight not working and there are exposed wires at the pole.',
-  'Garbage has not been collected for 5 days near the market.',
+  { label: 'Burst pipe', text: 'Water pipeline burst near our street. Water has been leaking continuously.' },
+  { label: 'Pothole', text: 'Large pothole near MG Road affecting daily commuters.' },
+  { label: 'Exposed wires', text: 'Streetlight not working and there are exposed wires at the pole.' },
+  { label: 'Missed pickup', text: 'Garbage has not been collected for 5 days near the market.' },
 ];
 
 /**
@@ -20,45 +20,47 @@ const EXAMPLES = [
  * directly in the browser. No data is sent anywhere.
  */
 export function ClassifierDemo() {
-  const [text, setText] = React.useState(EXAMPLES[0]!);
+  const [text, setText] = React.useState(EXAMPLES[0]!.text);
   const result = React.useMemo(() => (text.trim().length >= 10 ? classifyWithRules({ description: text }) : null), [text]);
 
   return (
-    <section className="py-20 lg:py-28">
-      <div className="container-page grid items-start gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
-        <Reveal className="grid gap-5">
-          <h2 className="text-3xl font-extrabold tracking-[-0.03em] text-fg md:text-[2.75rem] md:leading-[1.08]">Suggestions an official can check.</h2>
-          <p className="max-w-[54ch] text-lg leading-relaxed text-fg-muted">
-            Each report gets a suggested category, department and priority with the reasons behind it. Administrators accept or override it, and both
+    <section className="py-16 md:py-24">
+      <div className="container-page grid items-start gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
+        <Reveal className="grid gap-5 lg:sticky lg:top-24">
+          <h2 className="type-section text-fg">Suggestions an official can check.</h2>
+          <p className="type-lead max-w-[48ch]">
+            Each report gets a suggested category, department and priority, with the reasons behind it. An administrator accepts or overrides it, and both
             choices are recorded.
           </p>
-          <p className="max-w-[54ch] text-sm leading-relaxed text-fg-subtle">
-            This preview runs the same transparent keyword rules the server uses. It is not a trained model and shows no confidence scores. When an AI
-            provider is configured, results are labeled with their source.
+          <p className="max-w-[52ch] text-sm leading-relaxed text-fg-subtle">
+            This preview runs the same transparent keyword rules the server uses, in your browser. It is not a trained model and shows no confidence
+            scores. When an AI provider is configured, results are labeled with their source.
           </p>
         </Reveal>
 
-        <Reveal delay={0.1} className="panel grid gap-5 p-5 sm:p-6">
-          <div className="grid gap-2">
+        <Reveal delay={0.08} className="panel grid gap-5 p-5 sm:p-6">
+          <div className="grid gap-2.5">
             <label htmlFor="classifier-demo" className="text-sm font-semibold text-fg">
               Describe a civic issue
             </label>
             <Textarea id="classifier-demo" value={text} onChange={(e) => setText(e.target.value)} rows={3} maxLength={400} />
-            <div className="flex flex-wrap gap-1.5" aria-label="Example complaints">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="mr-1 text-xs text-fg-subtle">Try:</span>
               {EXAMPLES.map((ex) => (
                 <button
-                  key={ex}
+                  key={ex.label}
                   type="button"
-                  onClick={() => setText(ex)}
-                  className="rounded-full border border-line px-2.5 py-1 text-xs font-medium text-fg-muted transition-colors hover:border-line-strong hover:text-fg"
+                  onClick={() => setText(ex.text)}
+                  aria-pressed={text === ex.text}
+                  className="h-8 rounded-chip border border-line px-2.5 text-xs font-semibold text-fg-muted transition-colors hover:border-line-strong hover:text-fg aria-pressed:border-accent-line aria-pressed:bg-accent-soft aria-pressed:text-accent-text"
                 >
-                  {ex.split(' ').slice(0, 3).join(' ')}
+                  {ex.label}
                 </button>
               ))}
             </div>
           </div>
 
-          <div aria-live="polite" className="min-h-[178px] rounded-[14px] border border-line bg-surface-2 p-4">
+          <div aria-live="polite" className="min-h-[190px] rounded-control border border-line bg-surface-2 p-4 sm:p-5">
             <AnimatePresence mode="wait">
               {result ? (
                 <motion.div
@@ -69,22 +71,22 @@ export function ClassifierDemo() {
                   transition={{ duration: 0.2 }}
                   className="grid gap-4"
                 >
-                  <div className="flex items-center gap-2 text-xs font-semibold text-fg-subtle">
-                    <Sparkle size={14} weight="fill" className="text-accent" /> Suggested by the local rule-based classifier
-                  </div>
-                  <dl className="grid gap-3 sm:grid-cols-3">
-                    <div className="grid gap-1">
+                  <p className="flex items-center gap-2 text-xs font-semibold text-fg-subtle">
+                    <Sparkle size={14} weight="fill" className="text-accent-text" /> Suggested by the local rule-based classifier
+                  </p>
+                  <dl className="grid gap-4 sm:grid-cols-3">
+                    <div className="grid content-start gap-1.5">
                       <dt className="text-xs text-fg-subtle">Category</dt>
                       <dd>
                         <CategoryChip category={result.suggestedCategory} />
                       </dd>
                       <dd className="text-xs text-fg-subtle">{CATEGORY_META[result.suggestedCategory].group}</dd>
                     </div>
-                    <div className="grid gap-1">
+                    <div className="grid content-start gap-1.5">
                       <dt className="text-xs text-fg-subtle">Department</dt>
-                      <dd className="text-[13px] font-semibold text-fg">{result.suggestedDepartmentName}</dd>
+                      <dd className="text-sm font-semibold text-fg">{result.suggestedDepartmentName}</dd>
                     </div>
-                    <div className="grid gap-1">
+                    <div className="grid content-start gap-1.5">
                       <dt className="text-xs text-fg-subtle">Priority</dt>
                       <dd>
                         <PriorityLabel priority={result.suggestedPriority} />
@@ -92,7 +94,7 @@ export function ClassifierDemo() {
                       <dd className="sr-only">{PRIORITY_LABELS[result.suggestedPriority]}</dd>
                     </div>
                   </dl>
-                  <p className="text-[13px] leading-relaxed text-fg-muted">{result.explanation}</p>
+                  <p className="border-t border-line pt-3 text-[13px] leading-relaxed text-fg-muted">{result.explanation}</p>
                 </motion.div>
               ) : (
                 <motion.p key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-fg-subtle">

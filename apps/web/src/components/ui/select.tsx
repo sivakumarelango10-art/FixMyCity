@@ -39,7 +39,7 @@ export function Select({ id, value, onValueChange, options, placeholder, disable
         className={cn(
           inputBase,
           'flex items-center justify-between gap-2 text-left data-[placeholder]:text-fg-subtle',
-          size === 'sm' ? 'h-9 rounded-[10px] px-3 text-[13px]' : 'h-11',
+          size === 'sm' ? 'h-9 px-3 text-[13px] sm:text-[13px]' : 'h-11',
           className,
         )}
         {...aria}
@@ -48,24 +48,24 @@ export function Select({ id, value, onValueChange, options, placeholder, disable
           <SelectPrimitive.Value placeholder={placeholder} />
         </span>
         <SelectPrimitive.Icon>
-          <CaretDown size={14} className="text-fg-subtle" />
+          <CaretDown size={14} weight="bold" className="text-fg-subtle" />
         </SelectPrimitive.Icon>
       </SelectPrimitive.Trigger>
       <SelectPrimitive.Portal>
         <SelectPrimitive.Content
           position="popper"
           sideOffset={6}
-          className="z-50 max-h-[min(380px,var(--radix-select-content-available-height))] min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-[14px] border border-line bg-surface shadow-[var(--shadow-pop)] data-[state=open]:animate-[pop-in_160ms_cubic-bezier(0.16,1,0.3,1)]"
+          className="z-50 max-h-[min(380px,var(--radix-select-content-available-height))] min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-panel border border-line bg-surface-elevated shadow-[var(--shadow-pop)] data-[state=open]:animate-[pop-in_160ms_cubic-bezier(0.16,1,0.3,1)]"
         >
-          <SelectPrimitive.Viewport className="p-1.5">
+          <SelectPrimitive.Viewport className="p-1">
             {mapped.map((o) => (
               <SelectPrimitive.Item
                 key={o.value}
                 value={o.value}
-                className="relative flex cursor-pointer select-none items-start gap-2 rounded-[10px] py-2 pl-8 pr-3 text-sm text-fg outline-none data-[highlighted]:bg-surface-2 data-[state=checked]:font-semibold"
+                className="relative flex min-h-10 cursor-pointer select-none items-center gap-2 rounded-chip py-2 pl-8 pr-3 text-sm text-fg outline-none data-[highlighted]:bg-surface-2 data-[state=checked]:font-semibold"
               >
-                <SelectPrimitive.ItemIndicator className="absolute left-2.5 top-2.5">
-                  <Check size={14} weight="bold" className="text-accent" />
+                <SelectPrimitive.ItemIndicator className="absolute left-2.5 top-1/2 -translate-y-1/2">
+                  <Check size={14} weight="bold" className="text-accent-text" />
                 </SelectPrimitive.ItemIndicator>
                 <div>
                   <SelectPrimitive.ItemText>{o.label}</SelectPrimitive.ItemText>

@@ -3,112 +3,158 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * FixMyCity design tokens
- * - One accent: electric blue. Status and category hues are semantic only
- *   and always paired with an icon and a text label.
- * - Radius system: controls 12px, panels 18px, chips fully rounded.
- * - Dark is the brand default; light is a full alternative theme.
+ * FixMyCity design system: "Ink and signal"
+ *
+ * Navy ink on calm paper in light mode, midnight surfaces in dark mode.
+ * Colors follow the brand mark (navy, azure, teal). One action color
+ * (azure) marks what you can do: primary actions,
+ * links, focus, selection and progress. Status colors describe state only
+ * and always travel with an icon and a text label. Nothing else is colored.
+ *
+ * Shape rule: chips and badges 6px, controls 8px, containers 12px.
+ * Circles only for avatars, status dots and the route stations.
+ * Elevation rule: borders separate content; shadows only on overlays.
  */
 
 :root {
-  --bg: #f4f6fb;
-  --bg-elevated: #ffffffeb;
-  --surface: #fcfdff;
-  --surface-2: #eef2fa;
-  --surface-3: #e2e8f5;
-  --line: #d9e0ee;
-  --line-strong: #c3cde2;
-  --fg: #0b1230;
-  --fg-muted: #46526f;
-  --fg-subtle: #5f6b88;
-  --accent: #3a62e6;
-  --accent-hover: #2f55d6;
-  --accent-fg: #ffffff;
-  --accent-soft: #3a62e61a;
-  --accent-line: #3a62e64d;
-  --ring: #3a62e6;
-  --shadow-tint: 220 40% 30%;
+  /* Surfaces */
+  --background: #f4f4f1;
+  --surface: #fcfcfa;
+  --surface-elevated: #fefefd;
+  --surface-sunken: #efeeea;
+  --surface-strong: #e5e4df;
+  --border: #e0ded8;
+  --border-strong: #c9c6be;
 
-  --success: #138a5b;
-  --success-soft: #138a5b17;
-  --warning: #a35f00;
-  --warning-soft: #d9850022;
-  --danger: #c62f2f;
-  --danger-soft: #c62f2f14;
+  /* Text (navy ink) */
+  --text-primary: #0f1a2e;
+  --text-secondary: #475164;
+  --text-muted: #5f6878;
 
-  --st-submitted: #55617f;
-  --st-review: #0b7f93;
-  --st-assigned: #3a62e6;
-  --st-progress: #a35f00;
-  --st-resolved: #138a5b;
-  --st-rejected: #c62f2f;
-  --st-reopened: #c2410c;
+  /* Action color */
+  --primary: #0b62c4;
+  --primary-hover: #0a54a8;
+  --primary-foreground: #fbfcff;
+  --primary-text: #0b5fbd;
+  --primary-soft: rgb(11 98 196 / 0.09);
+  --primary-border: rgb(11 98 196 / 0.32);
+  --focus-ring: #0b62c4;
 
-  --map-filter: none;
+  /* Brand teal: the wordmark and logo only, never a UI accent. */
+  --brand-teal: #0b7774;
 
-  /* Chart series (validated: light surface #fcfdff, all checks pass) */
-  --chart-1: #3a62e6;
+  /* Feedback */
+  --success: #1b7347;
+  --success-soft: rgb(27 115 71 / 0.1);
+  --warning: #985400;
+  --warning-soft: rgb(217 133 0 / 0.14);
+  --danger: #b8322a;
+  --danger-soft: rgb(184 50 42 / 0.09);
+
+  /* Complaint status (state only, never decoration) */
+  --st-submitted: #556072;
+  --st-review: #6346bd;
+  --st-assigned: #0b6f87;
+  --st-progress: #a14c00;
+  --st-resolved: #1b7347;
+  --st-rejected: #b8322a;
+  --st-reopened: #a9305f;
+
+  /* Operations console rail (admin and department workspaces) */
+  --console-bg: #111d38;
+  --console-fg: #eef2f9;
+  --console-muted: #a3b2cc;
+  --console-line: rgb(255 255 255 / 0.09);
+  --console-hover: rgb(255 255 255 / 0.06);
+  --console-active: rgb(255 255 255 / 0.11);
+  --console-accent: #7cc0ff;
+
+  --shadow-tint: 222 45% 18%;
+  --map-tiles: saturate(0.32) contrast(0.96) brightness(1.03);
+  --pin-on-color: #ffffff;
+
+  /* Chart series (validated on #fcfcfa: all six checks pass) */
+  --chart-1: #0b62c4;
   --chart-2: #a35f00;
   --chart-3: #138a5b;
 }
 
 .dark {
-  --bg: #080d24;
-  --bg-elevated: #0b1230eb;
-  --surface: #0d1436;
-  --surface-2: #111b45;
-  --surface-3: #182550;
-  --line: #a8b5d31f;
-  --line-strong: #a8b5d338;
-  --fg: #f4f7fc;
-  --fg-muted: #a8b5d3;
-  --fg-subtle: #8a97b8;
-  --accent: #638bff;
-  --accent-hover: #7a9cff;
-  --accent-fg: #080d24;
-  --accent-soft: #638bff1f;
-  --accent-line: #638bff59;
-  --ring: #8aa7ff;
-  --shadow-tint: 230 70% 3%;
+  --background: #0a1020;
+  --surface: #0f1729;
+  --surface-elevated: #141e34;
+  --surface-sunken: #151f35;
+  --surface-strong: #1c2840;
+  --border: #1f2b42;
+  --border-strong: #2e3c58;
 
-  --success: #57d8ad;
-  --success-soft: #57d8ad1a;
-  --warning: #f5b544;
-  --warning-soft: #f59e0b1f;
-  --danger: #f87171;
-  --danger-soft: #ef44441f;
+  --text-primary: #edf1f7;
+  --text-secondary: #b0bacb;
+  --text-muted: #8b96a9;
 
-  --st-submitted: #a8b5d3;
-  --st-review: #48d8ea;
-  --st-assigned: #638bff;
-  --st-progress: #f5b544;
-  --st-resolved: #57d8ad;
-  --st-rejected: #f87171;
-  --st-reopened: #ff8a6b;
+  --primary: #4da3ff;
+  --primary-hover: #72b6ff;
+  --primary-foreground: #0a1020;
+  --primary-text: #62adf5;
+  --primary-soft: rgb(77 163 255 / 0.14);
+  --primary-border: rgb(77 163 255 / 0.38);
+  --focus-ring: #62adf5;
 
-  /* Chart series stepped for the dark band (validated on #0d1436, all checks pass) */
-  --chart-1: #638bff;
+  --brand-teal: #2cc2bd;
+
+  --success: #4fcf93;
+  --success-soft: rgb(79 207 147 / 0.12);
+  --warning: #f0b14a;
+  --warning-soft: rgb(240 177 74 / 0.13);
+  --danger: #ff7f73;
+  --danger-soft: rgb(255 127 115 / 0.12);
+
+  --st-submitted: #a9b4c7;
+  --st-review: #b7a1ff;
+  --st-assigned: #4fc9e3;
+  --st-progress: #f0b14a;
+  --st-resolved: #4fcf93;
+  --st-rejected: #ff7f73;
+  --st-reopened: #ff8fb8;
+
+  --console-bg: #0c1325;
+  --console-fg: #edf1f7;
+  --console-muted: #95a2b8;
+  --console-line: rgb(255 255 255 / 0.07);
+  --console-hover: rgb(255 255 255 / 0.05);
+  --console-active: rgb(255 255 255 / 0.09);
+  --console-accent: #62adf5;
+
+  --shadow-tint: 228 60% 3%;
+  --map-tiles: invert(1) hue-rotate(200deg) brightness(0.92) contrast(0.86) saturate(0.32);
+  --pin-on-color: #0a1020;
+
+  /* Chart series stepped for the dark band (validated on #0f1729) */
+  --chart-1: #3b8fe6;
   --chart-2: #c08220;
   --chart-3: #239c74;
 }
 
 @theme inline {
-  --color-bg: var(--bg);
-  --color-bg-elevated: var(--bg-elevated);
+  /* Utility names map onto the semantic tokens above. */
+  --color-bg: var(--background);
+  --color-bg-elevated: color-mix(in oklab, var(--background) 88%, transparent);
   --color-surface: var(--surface);
-  --color-surface-2: var(--surface-2);
-  --color-surface-3: var(--surface-3);
-  --color-line: var(--line);
-  --color-line-strong: var(--line-strong);
-  --color-fg: var(--fg);
-  --color-fg-muted: var(--fg-muted);
-  --color-fg-subtle: var(--fg-subtle);
-  --color-accent: var(--accent);
-  --color-accent-hover: var(--accent-hover);
-  --color-accent-fg: var(--accent-fg);
-  --color-accent-soft: var(--accent-soft);
-  --color-accent-line: var(--accent-line);
-  --color-ring: var(--ring);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-2: var(--surface-sunken);
+  --color-surface-3: var(--surface-strong);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-fg: var(--text-primary);
+  --color-fg-muted: var(--text-secondary);
+  --color-fg-subtle: var(--text-muted);
+  --color-accent: var(--primary);
+  --color-accent-hover: var(--primary-hover);
+  --color-accent-fg: var(--primary-foreground);
+  --color-accent-text: var(--primary-text);
+  --color-accent-soft: var(--primary-soft);
+  --color-accent-line: var(--primary-border);
+  --color-ring: var(--focus-ring);
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
   --color-warning: var(--warning);
@@ -122,17 +168,92 @@
   --color-st-resolved: var(--st-resolved);
   --color-st-rejected: var(--st-rejected);
   --color-st-reopened: var(--st-reopened);
+  --color-console: var(--console-bg);
+  --color-console-fg: var(--console-fg);
+  --color-console-muted: var(--console-muted);
+  --color-console-line: var(--console-line);
+  --color-console-hover: var(--console-hover);
+  --color-console-active: var(--console-active);
+  --color-console-accent: var(--console-accent);
+  --color-brand-teal: var(--brand-teal);
 
-  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-mona), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
-  --radius-control: 12px;
-  --radius-panel: 18px;
+  /* Type scale: caption sits between xs (12) and sm (14) for metadata. */
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.45;
 
-  --shadow-panel: 0 1px 0 0 hsl(var(--shadow-tint) / 0.04), 0 12px 32px -16px hsl(var(--shadow-tint) / 0.35);
-  --shadow-pop: 0 24px 64px -24px hsl(var(--shadow-tint) / 0.55);
+  --radius-chip: 6px;
+  --radius-control: 8px;
+  --radius-panel: 12px;
+
+  --shadow-panel: 0 1px 2px hsl(var(--shadow-tint) / 0.05);
+  --shadow-pop: 0 2px 6px -2px hsl(var(--shadow-tint) / 0.14), 0 16px 40px -16px hsl(var(--shadow-tint) / 0.32);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ------------------------------------------------------------------ */
+/* Typography roles                                                    */
+/* Mona Sans is variable in weight and width: display type runs a      */
+/* little wide for a signage feel, the operations console a little     */
+/* narrow for density, body text at its natural width.                 */
+/* ------------------------------------------------------------------ */
+
+@utility type-display {
+  font-size: clamp(2.6rem, 1.6rem + 3.6vw, 4.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  font-weight: 720;
+  font-variation-settings: 'wdth' 112;
+  text-wrap: balance;
+}
+@utility type-section {
+  font-size: clamp(1.85rem, 1.35rem + 1.7vw, 2.6rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  font-variation-settings: 'wdth' 110;
+  text-wrap: balance;
+}
+@utility type-page {
+  font-size: clamp(1.6rem, 1.4rem + 0.6vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  font-weight: 680;
+  font-variation-settings: 'wdth' 106;
+  text-wrap: balance;
+}
+@utility type-title {
+  font-size: 1rem;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  font-weight: 640;
+}
+@utility type-lead {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+@utility type-overline {
+  font-size: 0.75rem;
+  line-height: 1.3;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 650;
+}
+@utility type-metric {
+  font-size: 1.75rem;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-weight: 680;
+  font-variation-settings: 'wdth' 108;
+  font-variant-numeric: tabular-nums;
+}
+@utility font-narrow {
+  font-variation-settings: 'wdth' 92;
 }
 
 @layer base {
@@ -145,19 +266,26 @@
     color-scheme: dark;
   }
   body {
-    background: var(--bg);
-    color: var(--fg);
+    background: var(--background);
+    color: var(--text-primary);
     font-family: var(--font-sans);
-    font-feature-settings: 'ss01', 'cv11';
+    font-size: 1rem;
+    line-height: 1.55;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
   ::selection {
-    background: var(--accent-soft);
-    color: var(--fg);
+    background: var(--primary-soft);
+    color: var(--text-primary);
   }
   :focus-visible {
-    outline: 2px solid var(--ring);
+    outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
     border-radius: 6px;
   }
@@ -170,7 +298,7 @@
   }
   input::placeholder,
   textarea::placeholder {
-    color: var(--fg-subtle);
+    color: var(--text-muted);
     opacity: 1;
   }
 }
@@ -178,7 +306,7 @@
 @layer components {
   .container-page {
     width: 100%;
-    max-width: 1280px;
+    max-width: 1240px;
     margin-inline: auto;
     padding-inline: 1rem;
   }
@@ -198,16 +326,9 @@
        content such as tables; 0 lets inner overflow-x containers scroll instead. */
     min-width: 0;
     background: var(--surface);
-    border: 1px solid var(--line);
+    border: 1px solid var(--border);
     border-radius: var(--radius-panel);
     box-shadow: var(--shadow-panel);
-  }
-
-  .hairline-grid {
-    background-image:
-      linear-gradient(to right, var(--line) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--line) 1px, transparent 1px);
-    background-size: 56px 56px;
   }
 
   .tabular {
@@ -217,16 +338,29 @@
   .skeleton {
     position: relative;
     overflow: hidden;
-    background: var(--surface-2);
-    border-radius: 10px;
+    background: var(--surface-sunken);
+    border-radius: var(--radius-control);
   }
   .skeleton::after {
     content: '';
     position: absolute;
     inset: 0;
     transform: translateX(-100%);
-    background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--fg) 6%, transparent), transparent);
+    background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--text-primary) 5%, transparent), transparent);
     animation: shimmer 1.6s infinite;
+  }
+
+  /* Link with an underline that appears on hover, used for inline text links. */
+  .link {
+    color: var(--primary-text);
+    font-weight: 600;
+    text-decoration-line: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 3px;
+    transition: text-decoration-color 150ms;
+  }
+  .link:hover {
+    text-decoration-color: currentColor;
   }
 }
 
@@ -236,13 +370,13 @@
   }
 }
 
-@keyframes pulse-ring {
+@keyframes station-pulse {
   0% {
-    transform: scale(0.6);
-    opacity: 0.7;
+    transform: scale(1);
+    opacity: 0.55;
   }
   100% {
-    transform: scale(2.2);
+    transform: scale(2.3);
     opacity: 0;
   }
 }
@@ -253,45 +387,60 @@
 
 .leaflet-container {
   font-family: var(--font-sans);
-  background: var(--surface-2);
+  background: var(--surface-sunken);
+}
+.leaflet-container .leaflet-tile-pane {
+  filter: var(--map-tiles);
 }
 .leaflet-control-attribution {
-  background: color-mix(in oklab, var(--surface) 85%, transparent) !important;
-  color: var(--fg-subtle) !important;
-  font-size: 10px !important;
+  background: color-mix(in oklab, var(--surface) 88%, transparent) !important;
+  color: var(--text-muted) !important;
+  font-size: 10.5px !important;
+  border-top-left-radius: 6px;
+  padding: 1px 6px !important;
 }
 .leaflet-control-attribution a {
-  color: var(--fg-muted) !important;
-}
-.leaflet-bar a {
-  background: var(--surface) !important;
-  color: var(--fg) !important;
-  border-color: var(--line) !important;
+  color: var(--text-secondary) !important;
 }
 .leaflet-bar {
-  border: 1px solid var(--line) !important;
-  border-radius: 10px !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: var(--radius-control) !important;
   overflow: hidden;
-  box-shadow: var(--shadow-panel) !important;
+  box-shadow: var(--shadow-pop) !important;
+}
+.leaflet-bar a {
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 34px !important;
+  background: var(--surface-elevated) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border) !important;
+  font-size: 18px !important;
+}
+.leaflet-bar a:hover {
+  background: var(--surface-sunken) !important;
 }
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
-  background: var(--surface) !important;
-  color: var(--fg) !important;
-  border: 1px solid var(--line);
+  background: var(--surface-elevated) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border);
   box-shadow: var(--shadow-pop) !important;
 }
 .leaflet-popup-content-wrapper {
-  border-radius: 14px !important;
+  border-radius: var(--radius-panel) !important;
 }
 .leaflet-popup-content {
-  margin: 12px 14px !important;
+  margin: 14px 16px !important;
   font-size: 13px;
   line-height: 1.45;
 }
 .leaflet-popup-close-button span {
-  color: var(--fg-muted);
+  color: var(--text-secondary);
 }
+
+/* Markers: a rounded plate colored by where the report is on its route,
+   carrying the category glyph. Resolved pins step back visually. */
 .fmc-marker {
   background: transparent;
   border: none;
@@ -299,26 +448,62 @@
 .fmc-marker .pin {
   width: 30px;
   height: 30px;
-  border-radius: 999px;
+  border-radius: 9px;
   display: grid;
   place-items: center;
   color: #fff;
-  border: 2px solid var(--surface);
-  box-shadow: 0 6px 16px -6px rgb(0 0 0 / 0.6);
+  border: 2px solid var(--surface-elevated);
+  box-shadow: 0 6px 14px -6px hsl(var(--shadow-tint) / 0.7);
   transition: transform 160ms var(--ease-out-expo);
 }
-.fmc-marker:hover .pin {
-  transform: scale(1.12);
+.fmc-marker:hover .pin,
+.fmc-marker:focus-visible .pin {
+  transform: translateY(-2px) scale(1.08);
 }
 .fmc-marker .ring {
   position: absolute;
   inset: 0;
-  border-radius: 999px;
-  animation: pulse-ring 2.4s var(--ease-out-expo) infinite;
+  border-radius: 9px;
+  background: var(--primary);
+  opacity: 0.4;
+  animation: station-pulse 2.4s var(--ease-out-expo) infinite;
+}
+.fmc-marker [data-stage='open'] .pin {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.fmc-marker [data-stage='progress'] .pin {
+  background: var(--st-progress);
+  color: var(--pin-on-color);
+}
+.fmc-marker [data-stage='resolved'] .pin {
+  background: var(--st-resolved);
+  color: var(--pin-on-color);
+}
+.fmc-marker [data-stage='resolved'] {
+  opacity: 0.78;
+}
+.fmc-marker [data-stage='closed'] .pin {
+  background: var(--text-muted);
+  color: var(--surface);
+}
+.fmc-marker [data-stage='closed'] {
+  opacity: 0.6;
 }
 .fmc-marker.mine .pin {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+.fmc-marker.picker .pin {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px 999px 999px 4px;
+  transform: rotate(-45deg);
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.fmc-marker.picker .pin > * {
+  transform: rotate(45deg);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -330,10 +515,15 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
-  .fmc-marker .ring {
+  .fmc-marker .ring,
+  .station-pulse {
     display: none;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Overlay and disclosure motion                                        */
+/* ------------------------------------------------------------------ */
 
 @keyframes fade-in {
   from {
@@ -352,7 +542,7 @@
 @keyframes dialog-in {
   from {
     opacity: 0;
-    transform: translateY(10px) scale(0.97);
+    transform: translateY(8px) scale(0.98);
   }
   to {
     opacity: 1;
@@ -362,7 +552,7 @@
 @keyframes dialog-out {
   to {
     opacity: 0;
-    transform: translateY(6px) scale(0.98);
+    transform: translateY(4px) scale(0.99);
   }
 }
 @keyframes pop-in {
@@ -395,26 +585,11 @@
   }
 }
 
-/* Dark map: invert OSM tiles into a navy palette. Applied to tiles only, never markers. */
-.fmc-dark-tiles {
-  filter: invert(1) hue-rotate(195deg) brightness(0.92) contrast(0.88) saturate(0.45);
-}
-
 /* Entrance animation that runs from first paint, before hydration. */
 @keyframes enter-up {
   from {
     opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes enter-scale {
-  from {
-    opacity: 0;
-    transform: translateY(24px) scale(0.97);
+    transform: translateY(14px);
   }
   to {
     opacity: 1;
@@ -424,10 +599,6 @@
 @media (prefers-reduced-motion: no-preference) {
   .enter-up {
     animation: enter-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: var(--enter-delay, 0ms);
-  }
-  .enter-scale {
-    animation: enter-scale 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
     animation-delay: var(--enter-delay, 0ms);
   }
 }

@@ -105,6 +105,16 @@ export const DEPARTMENT_NAV: NavGroup[] = [
   },
 ];
 
+/** Items shown inline in the citizen top bar on wide screens; the rest live in the menu. */
+export const CITIZEN_TOP_NAV: NavItem[] = [
+  { href: '/dashboard', label: 'Dashboard', icon: House, exact: true },
+  { href: '/dashboard/complaints', label: 'My Complaints', icon: ClipboardText },
+  { href: '/dashboard/city-map', label: 'City Map', icon: MapTrifold },
+  { href: '/dashboard/announcements', label: 'City Updates', icon: Megaphone },
+  { href: '/dashboard/utilities', label: 'Utilities', icon: CreditCard },
+  { href: '/dashboard/help', label: 'Services & Help', icon: Lifebuoy },
+];
+
 export function navForRole(role: Role): NavGroup[] {
   if (role === 'ADMIN' || role === 'SUPER_ADMIN') return ADMIN_NAV;
   if (role === 'DEPARTMENT_OFFICER') return DEPARTMENT_NAV;

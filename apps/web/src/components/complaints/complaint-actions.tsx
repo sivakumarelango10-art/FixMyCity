@@ -197,8 +197,7 @@ export function StatusActions({ complaint, allowPhotos }: { complaint: Complaint
           return (
             <Button
               key={s}
-              variant={action?.tone === 'danger' ? 'outline' : (action?.tone ?? 'secondary')}
-              className={action?.tone === 'danger' ? 'border-danger/40 text-danger hover:bg-danger-soft' : undefined}
+              variant={action?.tone === 'danger' ? 'danger-quiet' : (action?.tone ?? 'secondary')}
               onClick={() => {
                 setError(null);
                 setText('');
@@ -423,7 +422,7 @@ export function CitizenFollowUp({ complaint }: { complaint: ComplaintDetail }) {
           </form>
         ) : null}
         {canReopen && (
-          <Button variant="outline" onClick={() => setReopenOpen(true)}>
+          <Button variant="secondary" onClick={() => setReopenOpen(true)}>
             <ArrowCounterClockwise size={16} /> The problem is back
           </Button>
         )}

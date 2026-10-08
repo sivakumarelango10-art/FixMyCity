@@ -9,12 +9,19 @@ import { Accordion, AccordionItem } from '@/components/ui/primitives';
 
 export function Faq() {
   return (
-    <section id="faq" className="scroll-mt-20 border-t border-line py-20 lg:py-28">
-      <div className="container-page grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
-        <Reveal>
-          <h2 className="text-3xl font-extrabold tracking-[-0.03em] text-fg md:text-[2.75rem] md:leading-[1.08]">Questions, answered.</h2>
+    <section id="faq" className="scroll-mt-20 border-t border-line py-16 md:py-24">
+      <div className="container-page grid gap-8 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)] lg:gap-16">
+        <Reveal className="grid content-start gap-3">
+          <h2 className="type-section text-fg">Questions, answered.</h2>
+          <p className="text-[15px] leading-relaxed text-fg-muted">
+            More in{' '}
+            <Link href="/help" className="link">
+              Help and contacts
+            </Link>
+            .
+          </p>
         </Reveal>
-        <Reveal delay={0.08}>
+        <Reveal delay={0.06}>
           <Accordion type="single" collapsible className="border-t border-line">
             {FAQ_ITEMS.map((item, i) => (
               <AccordionItem key={item.q} value={`faq-${i}`} question={item.q}>
@@ -30,11 +37,11 @@ export function Faq() {
 
 export function ClosingCta() {
   return (
-    <section className="pb-24">
+    <section className="pb-16 md:pb-24">
       <div className="container-page">
-        <Reveal className="relative overflow-hidden rounded-[24px] border border-accent-line bg-[radial-gradient(120%_140%_at_0%_0%,var(--accent-soft),transparent_60%)] px-6 py-14 sm:px-12 lg:px-16 lg:py-20">
-          <div className="grid max-w-3xl gap-6">
-            <p className="text-2xl font-extrabold leading-snug tracking-[-0.02em] text-fg md:text-[2.1rem] md:leading-[1.2]">
+        <Reveal className="relative overflow-hidden rounded-panel border border-accent-line bg-accent-soft px-6 py-12 sm:px-10 lg:px-14 lg:py-16">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-12">
+            <p className="max-w-3xl text-2xl font-semibold leading-snug tracking-[-0.02em] text-fg [font-variation-settings:'wdth'_106] md:text-[2rem] md:leading-[1.2]">
               A smarter city isn&apos;t just a city with more technology. It&apos;s a city where essential services work together for everyone.
             </p>
             <div className="flex flex-wrap gap-3">

@@ -15,11 +15,17 @@ function ThemedToaster() {
       theme={resolvedTheme === 'light' ? 'light' : 'dark'}
       position="bottom-right"
       closeButton
+      gap={10}
       toastOptions={{
         classNames: {
-          toast: '!rounded-[14px] !border !border-line !bg-surface !text-fg !shadow-[var(--shadow-pop)] !font-sans',
-          description: '!text-fg-muted',
-          actionButton: '!bg-accent !text-accent-fg !font-semibold',
+          toast: '!rounded-panel !border !border-line !bg-surface-elevated !text-fg !shadow-[var(--shadow-pop)] !font-sans !gap-3 !px-4 !py-3.5',
+          title: '!text-sm !font-semibold',
+          description: '!text-caption !text-fg-muted',
+          actionButton: '!rounded-control !bg-accent !text-accent-fg !font-semibold',
+          closeButton: '!border-line !bg-surface-elevated !text-fg-muted',
+          success: '[&_[data-icon]]:!text-success',
+          error: '[&_[data-icon]]:!text-danger',
+          info: '[&_[data-icon]]:!text-accent-text',
         },
       }}
     />
@@ -42,7 +48,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <QueryClientProvider client={client}>
         <MotionConfig reducedMotion="user">
           <TooltipProvider>

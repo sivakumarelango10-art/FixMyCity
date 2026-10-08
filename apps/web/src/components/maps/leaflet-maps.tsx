@@ -9,12 +9,11 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet';
-import { useTheme } from 'next-themes';
 import Link from 'next/link';
 import { Crosshair, MapPin } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 import { CATEGORY_META, DEMO_CITY, STATUS_LABELS, type PublicMapComplaint } from '@fixmycity/shared';
-import { CATEGORY_COLORS, CATEGORY_ICONS } from '@/components/common/complaint-meta';
+import { CATEGORY_ICONS, routeStage } from '@/components/common/complaint-meta';
 import { cn, timeAgo } from '@/lib/utils';
 
 // Standard OpenStreetMap tiles by default. Deployments can point at another
@@ -24,12 +23,11 @@ const TILE_ATTRIBUTION =
   process.env.NEXT_PUBLIC_MAP_TILE_ATTRIBUTION || '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 /**
- * Base tiles. In dark mode the tile layer (not the markers) is filtered to a
- * dark palette in globals.css. If tiles cannot be fetched, a notice explains
- * the blank background while markers keep working.
+ * Base tiles. Both themes filter the tile pane in globals.css (calmer in light,
+ * inverted to midnight in dark) so markers carry the color. If tiles cannot be
+ * fetched, a notice explains the blank background while markers keep working.
  */
-function ThemedTiles() {
-  const { resolvedTheme } = useTheme();
+function Tiles() {
   const [failed, setFailed] = React.useState(0);
   const [loaded, setLoaded] = React.useState(false);
   return (
@@ -38,7 +36,6 @@ function ThemedTiles() {
         attribution={TILE_ATTRIBUTION}
         url={TILE_URL}
         maxZoom={19}
-        className={resolvedTheme === 'light' ? undefined : 'fmc-dark-tiles'}
         eventHandlers={{
           tileload: () => setLoaded(true),
           tileerror: () => setFailed((n) => n + 1),
@@ -46,7 +43,7 @@ function ThemedTiles() {
       />
       {failed >= 4 && !loaded && (
         <div className="leaflet-bottom leaflet-left">
-          <div className="leaflet-control m-2 max-w-[260px] rounded-[10px] border border-line bg-surface px-3 py-2 text-[12px] text-fg-muted shadow-[var(--shadow-panel)]">
+          <div className="leaflet-control m-3 max-w-[260px] rounded-control border border-line bg-surface-elevated px-3 py-2 text-xs text-fg-muted shadow-[var(--shadow-pop)]">
             Map tiles could not be loaded on this network. Issue markers are still shown.
           </div>
         </div>
@@ -57,23 +54,21 @@ function ThemedTiles() {
 
 const iconCache = new Map<string, L.DivIcon>();
 
+/** Rounded plate colored by route stage, carrying the category glyph. */
 function markerIcon(c: Pick<PublicMapComplaint, 'category' | 'status' | 'isMine' | 'createdAt'>) {
-  const fresh = Date.now() - new Date(c.createdAt).getTime() < 48 * 3_600_000 && c.status !== 'RESOLVED';
-  const muted = c.status === 'RESOLVED';
-  const key = `${c.category}-${muted}-${fresh}-${c.isMine}`;
+  const stage = routeStage(c.status);
+  const fresh = Date.now() - new Date(c.createdAt).getTime() < 48 * 3_600_000 && stage === 'open';
+  const key = `${c.category}-${stage}-${fresh}-${c.isMine}`;
   const cached = iconCache.get(key);
   if (cached) return cached;
   const Icon = CATEGORY_ICONS[c.category];
-  const color = CATEGORY_COLORS[c.category];
-  const svg = renderToStaticMarkup(<Icon size={15} weight="bold" color="#ffffff" />);
+  const svg = renderToStaticMarkup(<Icon size={15} weight="bold" color="currentColor" />);
   const icon = L.divIcon({
     className: cn('fmc-marker', c.isMine && 'mine'),
-    html: `<div style="position:relative;width:30px;height:30px;opacity:${muted ? 0.55 : 1}">${
-      fresh ? `<span class="ring" style="background:${color}55"></span>` : ''
-    }<div class="pin" style="background:${color}">${svg}</div></div>`,
+    html: `<div class="wrap" data-stage="${stage}" style="position:relative;width:30px;height:30px">${fresh ? '<span class="ring"></span>' : ''}<div class="pin">${svg}</div></div>`,
     iconSize: [30, 30],
     iconAnchor: [15, 15],
-    popupAnchor: [0, -16],
+    popupAnchor: [0, -18],
   });
   iconCache.set(key, icon);
   return icon;
@@ -89,7 +84,7 @@ function FitToMarkers({ points }: { points: { latitude: number; longitude: numbe
       return;
     }
     const bounds = L.latLngBounds(points.map((p) => [p.latitude, p.longitude] as [number, number]));
-    map.fitBounds(bounds, { padding: [36, 36], maxZoom: 15 });
+    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
     // Refit only when the set of points changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signature, map]);
@@ -124,18 +119,54 @@ function LocateButton({ onLocated }: { onLocated?: (lat: number, lng: number) =>
   };
   return (
     <div className="leaflet-top leaflet-right">
-      <div className="leaflet-control">
+      <div className="leaflet-control m-3">
         <button
           type="button"
           onClick={locate}
           disabled={busy}
-          className="flex h-10 items-center gap-2 rounded-[10px] border border-line bg-surface px-3 text-[13px] font-semibold text-fg shadow-[var(--shadow-panel)] hover:bg-surface-2 disabled:opacity-60"
+          className="flex h-10 items-center gap-2 rounded-control border border-line-strong bg-surface-elevated px-3 text-[13px] font-semibold text-fg shadow-[var(--shadow-pop)] transition-colors hover:bg-surface-2 disabled:opacity-60"
           aria-label="Use my current location"
         >
-          <Crosshair size={16} weight="bold" className={busy ? 'animate-pulse' : undefined} />
+          <Crosshair size={16} weight="bold" className={busy ? 'motion-safe:animate-spin' : 'text-accent-text'} />
           {busy ? 'Locating' : 'My location'}
         </button>
       </div>
+    </div>
+  );
+}
+
+/** Flies to the selected report and opens its popup (list and map stay in sync). */
+function FocusMarker({ id, markers }: { id: string | null | undefined; markers: React.RefObject<Map<string, L.Marker>> }) {
+  const map = useMap();
+  React.useEffect(() => {
+    if (!id) return;
+    const marker = markers.current.get(id);
+    if (!marker) return;
+    map.flyTo(marker.getLatLng(), Math.max(map.getZoom(), 16), { duration: 0.6 });
+    const t = setTimeout(() => marker.openPopup(), 650);
+    return () => clearTimeout(t);
+  }, [id, map, markers]);
+  return null;
+}
+
+function ComplaintPopup({ c, href }: { c: PublicMapComplaint; href: string | null }) {
+  return (
+    <div className="grid min-w-[210px] max-w-[260px] gap-1.5">
+      <p className="text-[11.5px] font-semibold text-fg-subtle">{CATEGORY_META[c.category].label}</p>
+      <p className="text-sm font-semibold leading-snug text-fg">{c.title}</p>
+      <p className="text-xs text-fg-subtle">{c.address}</p>
+      <p className="text-xs text-fg-muted">
+        <span className="font-semibold text-fg">{STATUS_LABELS[c.status]}</span>, reported {timeAgo(c.createdAt)}
+      </p>
+      <p className="font-mono text-[11px] text-fg-subtle">
+        {c.trackingId}
+        {c.isDemo ? ' (demo record)' : ''}
+      </p>
+      {href && (
+        <Link href={href} className="link mt-1 text-xs">
+          Open tracking page
+        </Link>
+      )}
     </div>
   );
 }
@@ -148,19 +179,33 @@ export interface IssuesMapProps {
   complaints: PublicMapComplaint[];
   className?: string;
   interactive?: boolean;
+  /** Scroll-wheel zoom; off where the map sits inside a scrolling page. */
+  scrollZoom?: boolean;
   showLocate?: boolean;
   /** Builds the detail link for complaints the viewer is allowed to open. */
   linkFor?: (c: PublicMapComplaint) => string | null;
   ariaLabel?: string;
+  /** Report to fly to and open. */
+  selectedId?: string | null;
 }
 
-export function IssuesMapImpl({ complaints, className, interactive = true, showLocate, linkFor, ariaLabel = 'Map of reported civic issues' }: IssuesMapProps) {
+export function IssuesMapImpl({
+  complaints,
+  className,
+  interactive = true,
+  scrollZoom,
+  showLocate,
+  linkFor,
+  ariaLabel = 'Map of reported civic issues',
+  selectedId,
+}: IssuesMapProps) {
+  const markers = React.useRef(new Map<string, L.Marker>());
   return (
     <div className={cn('relative isolate overflow-hidden', className)} role="region" aria-label={ariaLabel}>
       <MapContainer
         center={[DEMO_CITY.center.latitude, DEMO_CITY.center.longitude]}
         zoom={DEMO_CITY.defaultZoom}
-        scrollWheelZoom={interactive}
+        scrollWheelZoom={scrollZoom ?? interactive}
         dragging={interactive}
         zoomControl={interactive}
         doubleClickZoom={interactive}
@@ -168,37 +213,26 @@ export function IssuesMapImpl({ complaints, className, interactive = true, showL
         keyboard={interactive}
         className="h-full w-full"
       >
-        <ThemedTiles />
+        <Tiles />
         <FitToMarkers points={complaints} />
+        <FocusMarker id={selectedId} markers={markers} />
         {showLocate && <LocateButton />}
-        {complaints.map((c) => {
-          const href = linkFor?.(c) ?? null;
-          return (
-            <Marker key={c.id} position={[c.latitude, c.longitude]} icon={markerIcon(c)} title={`${CATEGORY_META[c.category].label}: ${c.title}`}>
-              <Popup>
-                <div className="grid min-w-[200px] gap-1.5">
-                  <p className="text-[11px] font-semibold" style={{ color: CATEGORY_COLORS[c.category] }}>
-                    {CATEGORY_META[c.category].label}
-                  </p>
-                  <p className="text-[13.5px] font-bold leading-snug text-fg">{c.title}</p>
-                  <p className="text-xs text-fg-subtle">{c.address}</p>
-                  <p className="text-xs text-fg-muted">
-                    <span className="font-semibold">{STATUS_LABELS[c.status]}</span> · reported {timeAgo(c.createdAt)}
-                  </p>
-                  <p className="font-mono text-[11px] text-fg-subtle">
-                    {c.trackingId}
-                    {c.isDemo ? ' (demo)' : ''}
-                  </p>
-                  {href && (
-                    <Link href={href} className="mt-1 text-xs font-bold text-accent hover:underline">
-                      Open details
-                    </Link>
-                  )}
-                </div>
-              </Popup>
-            </Marker>
-          );
-        })}
+        {complaints.map((c) => (
+          <Marker
+            key={c.id}
+            position={[c.latitude, c.longitude]}
+            icon={markerIcon(c)}
+            title={`${CATEGORY_META[c.category].label}: ${c.title}`}
+            ref={(m) => {
+              if (m) markers.current.set(c.id, m);
+              else markers.current.delete(c.id);
+            }}
+          >
+            <Popup>
+              <ComplaintPopup c={c} href={linkFor?.(c) ?? null} />
+            </Popup>
+          </Marker>
+        ))}
       </MapContainer>
     </div>
   );
@@ -210,12 +244,10 @@ export function IssuesMapImpl({ complaints, className, interactive = true, showL
 
 const pickerIcon = () =>
   L.divIcon({
-    className: 'fmc-marker',
-    html: `<div class="pin" style="width:38px;height:38px;background:var(--accent);color:var(--accent-fg)">${renderToStaticMarkup(
-      <MapPin size={20} weight="fill" color="currentColor" />,
-    )}</div>`,
-    iconSize: [38, 38],
-    iconAnchor: [19, 19],
+    className: 'fmc-marker picker',
+    html: `<div class="pin">${renderToStaticMarkup(<MapPin size={20} weight="fill" color="currentColor" />)}</div>`,
+    iconSize: [40, 40],
+    iconAnchor: [20, 46],
   });
 
 function ClickToPlace({ onPick }: { onPick: (lat: number, lng: number) => void }) {
@@ -252,16 +284,16 @@ export function LocationPickerImpl({ value, onChange, nearby = [], className }: 
         scrollWheelZoom
         className="h-full w-full"
       >
-        <ThemedTiles />
+        <Tiles />
         <ClickToPlace onPick={onChange} />
         <Recenter value={value} />
         <LocateButton onLocated={onChange} />
         {nearby.map((c) => (
           <Marker key={c.id} position={[c.latitude, c.longitude]} icon={markerIcon(c)} title={c.title}>
             <Popup>
-              <p className="text-[13px] font-bold text-fg">{c.title}</p>
+              <p className="text-[13px] font-semibold text-fg">{c.title}</p>
               <p className="text-xs text-fg-subtle">
-                {STATUS_LABELS[c.status]} · {c.trackingId}
+                {STATUS_LABELS[c.status]}, {c.trackingId}
               </p>
             </Popup>
           </Marker>
@@ -281,6 +313,13 @@ export function LocationPickerImpl({ value, onChange, nearby = [], className }: 
           />
         )}
       </MapContainer>
+      {!value && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-3 z-[500] flex justify-center px-3">
+          <p className="rounded-control border border-line bg-surface-elevated px-3 py-2 text-[13px] font-medium text-fg shadow-[var(--shadow-pop)]">
+            Tap the map to drop a pin
+          </p>
+        </div>
+      )}
     </div>
   );
 }
