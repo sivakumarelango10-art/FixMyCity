@@ -49,7 +49,7 @@ export default function DepartmentHistoryPage() {
                       <TrackingId value={c.trackingId} />
                       <span className="text-xs text-fg-subtle">Resolved {timeAgo(c.resolvedAt)}</span>
                     </div>
-                    <p className="font-bold text-fg">{c.title}</p>
+                    <p className="font-semibold text-fg">{c.title}</p>
                     <CategoryChip category={c.category} />
                     {c.resolutionSummary && <p className="line-clamp-2 text-[13px] text-fg-muted">{c.resolutionSummary}</p>}
                   </Link>

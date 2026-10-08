@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { CreditCard, Receipt } from '@phosphor-icons/react';
+import { CreditCard, Receipt, WarningCircle } from '@phosphor-icons/react';
 import { UTILITY_LABELS, UTILITY_SERVICE_TYPES, type BillDto, type PaymentDto } from '@fixmycity/shared';
-import { PageHeader, StatCard } from '@/components/common/page';
+import { MetricStrip, PageHeader } from '@/components/common/page';
 import { BillRow, DemoNotice, SERVICE_ICONS } from '@/components/utilities/bill-ui';
 import { EmptyState, ErrorState, Panel, PanelHeader, Skeleton } from '@/components/ui/primitives';
 import { api } from '@/lib/api';
@@ -31,14 +31,18 @@ export default function UtilitiesPage() {
       />
       <DemoNotice />
 
-      <section aria-label="Bill summary" className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard index={0} label="Bills due" value={unpaid.length} loading={bills.isLoading} icon={<CreditCard size={17} />} tone="warning" />
-        <StatCard index={1} label="Outstanding" value={bills.isLoading ? undefined : formatMoney(outstanding)} loading={bills.isLoading} />
-        <StatCard index={2} label="Overdue" value={unpaid.filter((b) => b.isOverdue).length} loading={bills.isLoading} tone="danger" />
-        <StatCard index={3} label="Demo payments" value={payments.data?.length} loading={payments.isLoading} icon={<Receipt size={17} />} tone="success" />
-      </section>
+      <MetricStrip
+        label="Bill summary"
+        loading={bills.isLoading}
+        metrics={[
+          { label: 'Bills due', value: unpaid.length, icon: <CreditCard size={15} weight="bold" />, tone: 'warning' },
+          { label: 'Outstanding', value: bills.isLoading ? undefined : formatMoney(outstanding) },
+          { label: 'Overdue', value: unpaid.filter((b) => b.isOverdue).length, tone: 'danger', icon: <WarningCircle size={15} weight="bold" /> },
+          { label: 'Demo payments', value: payments.data?.length, icon: <Receipt size={15} weight="bold" />, tone: 'success' },
+        ]}
+      />
 
-      {bills.isError && <ErrorState className="panel" message={(bills.error as Error).message} onRetry={() => bills.refetch()} />}
+      {bills.isError && <ErrorState className="panel" title="Your bills could not be loaded" message={(bills.error as Error).message} onRetry={() => bills.refetch()} />}
 
       <div className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
         <div className="grid content-start gap-6">
@@ -60,7 +64,7 @@ export default function UtilitiesPage() {
                   ))}
                 </ul>
               ) : (
-                <EmptyState icon={<CreditCard size={22} />} title="Nothing due" description="All your demo bills are paid." />
+                <EmptyState icon={<CreditCard size={22} />} title="Nothing due" description="Every demo bill on your account is paid. New bills appear here when they are issued." />
               )}
             </div>
           </Panel>
@@ -86,7 +90,7 @@ export default function UtilitiesPage() {
                 const Icon = SERVICE_ICONS[type];
                 return (
                   <li key={type} className="flex items-center gap-3">
-                    <span className="grid h-9 w-9 place-items-center rounded-control bg-surface-2 text-fg-muted">
+                    <span className="grid h-9 w-9 place-items-center rounded-control border border-line bg-surface-2 text-fg-muted" aria-hidden>
                       <Icon size={17} />
                     </span>
                     <span className="grid min-w-0">
@@ -121,7 +125,7 @@ export default function UtilitiesPage() {
                   ))}
                 </ul>
               ) : (
-                <p className="text-sm text-fg-subtle">No demo payments yet.</p>
+                <p className="text-sm text-fg-subtle">No demo payments yet. Paying a bill above adds a receipt here.</p>
               )}
             </div>
           </Panel>

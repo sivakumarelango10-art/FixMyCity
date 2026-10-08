@@ -72,7 +72,7 @@ export function AuditRow({ e, expandable }: { e: AuditLogDto; expandable?: boole
           </p>
           {detail &&
             (link ? (
-              <Link href={link} className="truncate text-[12.5px] font-medium text-accent hover:underline">
+              <Link href={link} className="link truncate text-[12.5px] font-medium">
                 {detail}
               </Link>
             ) : (

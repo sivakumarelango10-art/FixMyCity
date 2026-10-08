@@ -226,9 +226,9 @@ export default function UsersPage() {
             <ul className="divide-y divide-line">
               {(q.data?.data ?? []).map((u) => (
                 <li key={u.id} className="grid grid-cols-[40px_1fr_auto] items-center gap-4 px-5 py-3.5 sm:grid-cols-[40px_1.4fr_1fr_auto_auto]">
-                  <span className="grid h-10 w-10 place-items-center rounded-full bg-surface-2 text-xs font-bold text-fg-muted">{initials(u.name)}</span>
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line bg-surface-2 text-xs font-bold text-fg-muted" aria-hidden>{initials(u.name)}</span>
                   <span className="grid min-w-0">
-                    <span className="truncate text-[14px] font-bold text-fg">{u.name}</span>
+                    <span className="truncate text-sm font-semibold text-fg">{u.name}</span>
                     <span className="truncate text-xs text-fg-subtle">{u.email}</span>
                   </span>
                   <span className="hidden min-w-0 sm:grid">

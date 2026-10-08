@@ -220,7 +220,7 @@ export default function AdminAnnouncementsPage() {
                         )}
                         {a.isDemo && <Badge>Demo</Badge>}
                       </div>
-                      <p className="truncate text-[15px] font-bold text-fg">{a.title}</p>
+                      <p className="truncate text-[15px] font-semibold text-fg">{a.title}</p>
                       <p className="text-xs text-fg-subtle">
                         {a.publishedAt ? `Publishes ${formatDateTime(a.publishedAt)}` : 'Not scheduled'}
                         {a.expiresAt ? `, expires ${formatDateTime(a.expiresAt)}` : ''}

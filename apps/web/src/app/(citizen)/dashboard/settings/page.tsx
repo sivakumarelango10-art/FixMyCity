@@ -6,7 +6,7 @@ import { PageHeader } from '@/components/common/page';
 export default function CitizenSettingsPage() {
   return (
     <>
-      <PageHeader title="Settings" description="Appearance, password and signed-in devices." />
+      <PageHeader breadcrumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Settings' }]} title="Settings" description="Appearance, password and signed-in devices." />
       <SettingsPanels />
     </>
   );

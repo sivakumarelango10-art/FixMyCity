@@ -18,14 +18,14 @@ export function DemoNotice({ className, compact }: { className?: string; compact
     <div
       role="note"
       className={cn(
-        'flex items-start gap-2.5 rounded-control border border-warning/40 bg-warning-soft px-4 py-3 text-warning',
+        'flex items-start gap-3 rounded-control border border-warning/35 bg-warning-soft px-4 py-3 text-warning',
         compact && 'px-3 py-2',
         className,
       )}
     >
       <Warning size={18} weight="bold" className="mt-0.5 shrink-0" />
       <div className="grid gap-0.5">
-        <p className="text-[13px] font-extrabold tracking-wide">{DEMO_PAYMENT_NOTICE}</p>
+        <p className="text-[13px] font-bold tracking-wide">{DEMO_PAYMENT_NOTICE}</p>
         {!compact && <p className="text-[12.5px] font-medium text-fg-muted">These bills are simulated records. No biller, bank or payment network is connected, and no card or UPI details are ever requested.</p>}
       </div>
     </div>
@@ -53,18 +53,18 @@ export function BillRow({ bill }: { bill: BillDto }) {
   return (
     <Link
       href={`/dashboard/utilities/${bill.id}`}
-      className="group grid grid-cols-[40px_1fr_auto] items-center gap-4 rounded-panel px-3 py-3 transition-colors hover:bg-surface-2 sm:grid-cols-[40px_1.4fr_1fr_auto_auto]"
+      className="group grid grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-4 rounded-control px-3 py-3 transition-colors hover:bg-surface-2 sm:grid-cols-[40px_minmax(0,1.4fr)_minmax(0,1fr)_auto_auto]"
     >
-      <span className="grid h-10 w-10 place-items-center rounded-control bg-surface-2 text-fg-muted group-hover:bg-surface-3">
+      <span className="grid h-10 w-10 place-items-center rounded-control border border-line bg-surface-2 text-fg-muted" aria-hidden>
         <Icon size={19} />
       </span>
       <span className="grid min-w-0">
-        <span className="truncate text-[14px] font-bold text-fg">{bill.serviceLabel}</span>
+        <span className="truncate text-sm font-semibold text-fg">{bill.serviceLabel}</span>
         <span className="truncate text-xs text-fg-subtle">{bill.billingPeriod}</span>
       </span>
       <span className="hidden text-[13px] text-fg-muted sm:block">{bill.status === 'PAID' ? `Paid ${formatDate(bill.paidAt)}` : `Due ${formatDate(bill.dueDate)}`}</span>
       <span className="grid justify-items-end gap-1">
-        <span className="text-[15px] font-bold text-fg tabular">{formatMoney(bill.amount)}</span>
+        <span className="text-[15px] font-semibold text-fg tabular">{formatMoney(bill.amount)}</span>
         <BillStatusBadge bill={bill} />
       </span>
       <CaretRight size={15} className="hidden text-fg-subtle sm:block" />

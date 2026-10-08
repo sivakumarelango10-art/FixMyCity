@@ -6,7 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
-import { Desktop, Monitor, Moon, SignOut, Sun } from '@phosphor-icons/react';
+import { ArrowRight, Bell, ClipboardText, Desktop, GearSix, Monitor, Moon, SignOut, Sun, type Icon } from '@phosphor-icons/react';
+import Link from 'next/link';
 import {
   changePasswordSchema,
   ROLE_LABELS,
@@ -26,7 +27,7 @@ import { ApiError, api } from '@/lib/api';
 import { applyServerErrors } from '@/lib/forms';
 import { qk } from '@/lib/query-keys';
 import { useIsClient } from '@/lib/hooks';
-import { cn, formatDate, timeAgo } from '@/lib/utils';
+import { cn, formatDate, initials, timeAgo } from '@/lib/utils';
 
 export function ProfileForm() {
   const user = useSessionUser();
@@ -84,9 +85,9 @@ function ThemePanel() {
   const { theme, setTheme } = useTheme();
   const mounted = useIsClient();
   const options = [
-    { value: 'dark', label: 'Dark', icon: Moon },
+    { value: 'system', label: 'Match device', icon: Desktop },
     { value: 'light', label: 'Light', icon: Sun },
-    { value: 'system', label: 'System', icon: Desktop },
+    { value: 'dark', label: 'Dark', icon: Moon },
   ];
   return (
     <Panel>
@@ -102,8 +103,8 @@ function ThemePanel() {
               aria-checked={active}
               onClick={() => setTheme(value)}
               className={cn(
-                'grid justify-items-center gap-2 rounded-panel border px-3 py-4 text-sm font-semibold transition-colors',
-                active ? 'border-accent bg-accent-soft text-fg' : 'border-line text-fg-muted hover:border-line-strong hover:text-fg',
+                'grid min-h-20 content-center justify-items-center gap-2 rounded-control border px-3 py-4 text-sm font-semibold transition-colors',
+                active ? 'border-accent bg-accent-soft text-fg ring-1 ring-accent' : 'border-line text-fg-muted hover:border-line-strong hover:text-fg',
               )}
             >
               <Icon size={20} weight={active ? 'fill' : 'regular'} />
@@ -176,14 +177,16 @@ function SessionsPanel() {
       <div className="grid gap-3 p-5 sm:p-6">
         {sessions.isLoading ? (
           <Skeleton className="h-20" />
+        ) : sessions.isError ? (
+          <p className="text-sm text-fg-subtle">Signed-in devices could not be loaded. Reload the page to try again.</p>
         ) : (
           <ul className="grid gap-2">
             {(sessions.data ?? []).map((s) => (
               <li key={s.id} className="flex flex-wrap items-center justify-between gap-3 rounded-control border border-line px-4 py-3">
                 <span className="flex items-center gap-3">
-                  <Monitor size={20} className="text-fg-subtle" />
+                  <Monitor size={20} className="shrink-0 text-fg-subtle" aria-hidden />
                   <span className="grid">
-                    <span className="text-[13.5px] font-semibold text-fg">
+                    <span className="flex flex-wrap items-center gap-2 text-sm font-semibold text-fg">
                       {describeAgent(s.userAgent)} {s.current && <Badge tone="accent">This device</Badge>}
                     </span>
                     <span className="text-xs text-fg-subtle">
@@ -231,5 +234,52 @@ export function SettingsPanels({ includeProfile = false }: { includeProfile?: bo
       </div>
       <SessionsPanel />
     </div>
+  );
+}
+
+const PROFILE_LINKS: { href: string; label: string; detail: string; icon: Icon }[] = [
+  { href: '/dashboard/complaints', label: 'My complaints', detail: 'Everything you have reported', icon: ClipboardText },
+  { href: '/dashboard/notifications', label: 'Notifications', detail: 'Status changes and notices', icon: Bell },
+  { href: '/dashboard/settings', label: 'Settings and security', detail: 'Theme, password and devices', icon: GearSix },
+];
+
+/** Identity summary and the places a citizen manages their account from. */
+export function ProfileOverview() {
+  const user = useSessionUser();
+  const signOut = useSignOut();
+  return (
+    <Panel className="overflow-hidden">
+      <div className="grid justify-items-start gap-4 p-5 sm:p-6">
+        <span className="grid h-16 w-16 place-items-center rounded-full bg-[#13234a] text-xl font-bold text-[#e9eef7]" aria-hidden>
+          {initials(user.name)}
+        </span>
+        <div className="grid min-w-0 gap-0.5">
+          <p className="truncate text-lg font-semibold tracking-[-0.015em] text-fg">{user.name}</p>
+          <p className="truncate text-sm text-fg-muted">{user.email}</p>
+          <p className="mt-1 text-xs text-fg-subtle">
+            {ROLE_LABELS[user.role]} account since {formatDate(user.createdAt)}
+          </p>
+        </div>
+      </div>
+      <ul className="divide-y divide-line border-t border-line">
+        {PROFILE_LINKS.map(({ href, label, detail, icon: LinkIcon }) => (
+          <li key={href}>
+            <Link href={href} className="group flex items-center gap-3 px-5 py-3.5 transition-colors hover:bg-surface-2 sm:px-6">
+              <LinkIcon size={19} className="shrink-0 text-fg-subtle" aria-hidden />
+              <span className="grid min-w-0 flex-1">
+                <span className="text-sm font-semibold text-fg">{label}</span>
+                <span className="text-xs text-fg-subtle">{detail}</span>
+              </span>
+              <ArrowRight size={14} weight="bold" className="text-fg-subtle transition-transform group-hover:translate-x-0.5" aria-hidden />
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <div className="border-t border-line p-4 sm:px-6">
+        <Button variant="danger-quiet" size="sm" onClick={() => void signOut()}>
+          <SignOut size={16} aria-hidden /> Sign out
+        </Button>
+      </div>
+    </Panel>
   );
 }

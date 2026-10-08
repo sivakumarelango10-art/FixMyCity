@@ -4,7 +4,7 @@ import * as React from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { CATEGORY_META, type AdminAnalytics } from '@fixmycity/shared';
 import { CategoryChart, PriorityChart, ResolutionTrendChart, StatusChart, TrendChart, WorkloadChart } from '@/components/admin/analytics-charts';
-import { PageHeader, StatCard } from '@/components/common/page';
+import { MetricStrip, PageHeader } from '@/components/common/page';
 import { ErrorState, Panel, PanelHeader, Tabs, TabsList, TabsTrigger } from '@/components/ui/primitives';
 import { api } from '@/lib/api';
 import { qk } from '@/lib/query-keys';
@@ -41,20 +41,22 @@ export default function AnalyticsPage() {
         }
         className="mb-0"
       />
-      {q.isError && <ErrorState className="panel" message={(q.error as Error).message} onRetry={() => q.refetch()} />}
+      {q.isError && <ErrorState className="panel" title="Analytics could not be loaded" message={(q.error as Error).message} onRetry={() => q.refetch()} />}
 
-      <section aria-label="Key figures" className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard index={0} label="Open complaints" value={a?.totals.open} loading={q.isLoading} />
-        <StatCard index={1} label="Resolved share" value={resolvedShare === null ? undefined : `${resolvedShare}%`} loading={q.isLoading} hint="Resolved out of all complaints" />
-        <StatCard
-          index={2}
-          label="Avg. resolution time"
-          value={a ? (formatHours(a.averageResolutionHours) ?? 'Not enough data') : undefined}
-          loading={q.isLoading}
-          hint={a ? `Shown once at least 3 are resolved (${a.resolvedSampleSize} so far)` : undefined}
-        />
-        <StatCard index={3} label="Rejected" value={a?.totals.REJECTED} loading={q.isLoading} hint="Duplicates and invalid reports" />
-      </section>
+      <MetricStrip
+        label="Key figures"
+        loading={q.isLoading}
+        metrics={[
+          { label: 'Open complaints', value: a?.totals.open },
+          { label: 'Resolved share', value: resolvedShare === null ? undefined : `${resolvedShare}%`, hint: 'Resolved out of all complaints' },
+          {
+            label: 'Avg. resolution time',
+            value: a ? (formatHours(a.averageResolutionHours) ?? 'Not enough data') : undefined,
+            hint: a ? `Shown once at least 3 are resolved (${a.resolvedSampleSize} so far)` : undefined,
+          },
+          { label: 'Rejected', value: a?.totals.REJECTED, hint: 'Duplicates and invalid reports' },
+        ]}
+      />
 
       <TrendChart a={a} loading={q.isLoading} />
       <div className="grid gap-6 xl:grid-cols-2">
@@ -75,17 +77,17 @@ export default function AnalyticsPage() {
             {a && a.repeatHotspots.length > 0 ? (
               <ul className="grid gap-3">
                 {a.repeatHotspots.map((h) => (
-                  <li key={`${h.address}-${h.category}`} className="flex items-center justify-between gap-4 rounded-control bg-surface-2 px-4 py-3">
+                  <li key={`${h.address}-${h.category}`} className="flex items-center justify-between gap-4 rounded-control border border-line px-4 py-3">
                     <span className="grid min-w-0">
                       <span className="truncate text-[13.5px] font-semibold text-fg">{h.address}</span>
                       <span className="text-xs text-fg-subtle">{CATEGORY_META[h.category].label}</span>
                     </span>
-                    <span className="text-lg font-extrabold text-fg tabular">{h.count}</span>
+                    <span className="text-lg font-bold text-fg tabular">{h.count}</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-fg-subtle">{q.isLoading ? 'Loading' : 'No repeated locations yet.'}</p>
+              <p className="text-sm text-fg-subtle">{q.isLoading ? 'Loading locations' : 'No location has two or more reports in the same category yet.'}</p>
             )}
           </div>
         </Panel>

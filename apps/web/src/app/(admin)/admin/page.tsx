@@ -6,7 +6,7 @@ import { ArrowRight, Buildings, CheckCircle, ClipboardText, Clock, MagnifyingGla
 import type { AdminAnalytics, ComplaintListItem } from '@fixmycity/shared';
 import { CategoryChart, StatusChart, TrendChart, WorkloadChart } from '@/components/admin/analytics-charts';
 import { AuditList } from '@/components/admin/audit-list';
-import { PageHeader, StatCard } from '@/components/common/page';
+import { MetricStrip, PageHeader } from '@/components/common/page';
 import { ComplaintCards, ComplaintListSkeleton } from '@/components/complaints/complaint-list';
 import { Button } from '@/components/ui/button';
 import { EmptyState, ErrorState, Panel, PanelHeader } from '@/components/ui/primitives';
@@ -28,8 +28,8 @@ export default function AdminOverviewPage() {
   return (
     <div className="grid gap-7">
       <PageHeader
-        title="Municipal operations"
-        description="Every complaint in the city, routed and tracked in one place."
+        title="Operations overview"
+        description="What is waiting for review, who is working on what, and how fast it gets resolved. Last 30 days."
         actions={
           <Button asChild>
             <Link href="/admin/complaints">
@@ -39,44 +39,47 @@ export default function AdminOverviewPage() {
         }
         className="mb-0"
       />
-      {q.isError && <ErrorState className="panel" message={(q.error as Error).message} onRetry={() => q.refetch()} />}
+      {q.isError && <ErrorState className="panel" title="Operations data could not be loaded" message={(q.error as Error).message} onRetry={() => q.refetch()} />}
 
-      <section aria-label="Totals" className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatCard index={0} label="Total complaints" value={t?.total} loading={q.isLoading} icon={<ClipboardText size={17} />} href="/admin/complaints" />
-        <StatCard index={1} label="New" value={t?.SUBMITTED} loading={q.isLoading} icon={<PaperPlaneTilt size={17} />} tone="accent" hint="Waiting for review" />
-        <StatCard index={2} label="Under review" value={t?.UNDER_REVIEW} loading={q.isLoading} icon={<MagnifyingGlass size={17} />} tone="review" />
-        <StatCard index={3} label="Assigned" value={t ? t.ASSIGNED + t.REOPENED : undefined} loading={q.isLoading} icon={<Signpost size={17} />} tone="accent" hint={t?.REOPENED ? `${t.REOPENED} reopened` : undefined} />
-        <StatCard index={4} label="In progress" value={t?.IN_PROGRESS} loading={q.isLoading} icon={<Wrench size={17} />} tone="warning" />
-        <StatCard index={5} label="Resolved" value={t?.RESOLVED} loading={q.isLoading} icon={<CheckCircle size={17} />} tone="success" />
-        <StatCard
-          index={6}
-          label="Avg. resolution time"
-          value={a ? (avg ?? 'Not enough data') : undefined}
-          loading={q.isLoading}
-          icon={<Clock size={17} />}
-          hint={a ? `Based on ${a.resolvedSampleSize} resolved complaints` : undefined}
-        />
-        <StatCard index={7} label="Active departments" value={a?.activeDepartments} loading={q.isLoading} icon={<Buildings size={17} />} href="/admin/departments" />
-      </section>
+      <MetricStrip
+        label="Complaint pipeline"
+        loading={q.isLoading}
+        metrics={[
+          { label: 'New', value: t?.SUBMITTED, icon: <PaperPlaneTilt size={15} weight="bold" />, tone: 'accent', hint: 'Waiting for review', href: '/admin/complaints?status=SUBMITTED' },
+          { label: 'Under review', value: t?.UNDER_REVIEW, icon: <MagnifyingGlass size={15} weight="bold" />, tone: 'review', href: '/admin/complaints?status=UNDER_REVIEW' },
+          { label: 'Assigned', value: t ? t.ASSIGNED + t.REOPENED : undefined, icon: <Signpost size={15} weight="bold" />, hint: t?.REOPENED ? `${t.REOPENED} reopened` : undefined, href: '/admin/complaints?status=ASSIGNED' },
+          { label: 'In progress', value: t?.IN_PROGRESS, icon: <Wrench size={15} weight="bold" />, tone: 'warning', href: '/admin/complaints?status=IN_PROGRESS' },
+          { label: 'Resolved', value: t?.RESOLVED, icon: <CheckCircle size={15} weight="bold" />, tone: 'success', href: '/admin/complaints?status=RESOLVED' },
+        ]}
+      />
+      <MetricStrip
+        label="Service figures"
+        loading={q.isLoading}
+        metrics={[
+          { label: 'Total complaints', value: t?.total, icon: <ClipboardText size={15} weight="bold" />, href: '/admin/complaints' },
+          { label: 'Avg. resolution time', value: a ? (avg ?? 'Not enough data') : undefined, icon: <Clock size={15} weight="bold" />, hint: a ? `Based on ${a.resolvedSampleSize} resolved complaints` : undefined },
+          { label: 'Active departments', value: a?.activeDepartments, icon: <Buildings size={15} weight="bold" />, href: '/admin/departments' },
+        ]}
+      />
 
       <div className="grid gap-6 xl:grid-cols-[1.25fr_1fr]">
-        <Panel>
+        <Panel className="overflow-hidden">
           <PanelHeader
             title="Needs assignment"
             description="Newest reports without a department."
             action={
-              <Link href="/admin/complaints" className="inline-flex items-center gap-1 text-[13px] font-semibold text-accent hover:underline">
+              <Link href="/admin/complaints?department=unassigned" className="link inline-flex items-center gap-1 text-[13px]">
                 All complaints <ArrowRight size={13} />
               </Link>
             }
           />
-          <div className="p-4 sm:p-5">
+          <div className="mt-4 border-t border-line">
             {queue.isLoading ? (
               <ComplaintListSkeleton rows={3} />
             ) : queue.data && queue.data.data.length > 0 ? (
               <ComplaintCards items={queue.data.data} hrefFor={(c) => `/admin/complaints/${c.id}`} />
             ) : (
-              <EmptyState icon={<CheckCircle size={22} />} title="Queue is clear" description="Every complaint has a department." />
+              <EmptyState icon={<CheckCircle size={22} />} title="The queue is clear" description="Every complaint has a department. New reports appear here as they arrive." />
             )}
           </div>
         </Panel>
@@ -95,7 +98,7 @@ export default function AdminOverviewPage() {
           title="Recent activity"
           description="Latest actions from the audit log."
           action={
-            <Link href="/admin/audit-logs" className="text-[13px] font-semibold text-accent hover:underline">
+            <Link href="/admin/audit-logs" className="link text-[13px]">
               Full audit log
             </Link>
           }

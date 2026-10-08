@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { use } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'motion/react';
@@ -90,9 +91,32 @@ export default function BillPage({ params }: { params: Promise<{ billId: string 
     setOpen(true);
   };
 
-  if (bill.isLoading) return <Skeleton className="h-96 rounded-panel" />;
+  if (bill.isLoading)
+    return (
+      <div className="grid gap-6" role="status" aria-label="Loading bill">
+        <Skeleton className="h-9 w-2/3" />
+        <Skeleton className="h-14" />
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Skeleton className="h-80 rounded-panel" />
+          <Skeleton className="h-80 rounded-panel" />
+        </div>
+      </div>
+    );
   if (bill.isError || !bill.data) {
-    return <ErrorState className="panel" message={bill.error instanceof ApiError && bill.error.status === 404 ? 'This bill was not found on your account.' : 'Could not load this bill.'} />;
+    const missing = bill.error instanceof ApiError && bill.error.status === 404;
+    return (
+      <ErrorState
+        className="panel"
+        title={missing ? 'This bill is not on your account' : 'This bill could not be loaded'}
+        message={missing ? 'It may belong to another account, or the link is out of date.' : 'Check your connection and try again.'}
+        onRetry={missing ? undefined : () => bill.refetch()}
+        action={
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/dashboard/utilities">Back to utilities</Link>
+          </Button>
+        }
+      />
+    );
   }
   const b = bill.data;
   const Icon = SERVICE_ICONS[b.serviceType];
@@ -115,14 +139,14 @@ export default function BillPage({ params }: { params: Promise<{ billId: string 
         <Panel className="print:hidden">
           <div className="grid gap-6 p-6 sm:p-7">
             <div className="flex items-start justify-between gap-4">
-              <span className="grid h-12 w-12 place-items-center rounded-panel bg-accent-soft text-accent">
+              <span className="grid h-12 w-12 place-items-center rounded-panel border border-line bg-surface-2 text-fg-muted" aria-hidden>
                 <Icon size={24} />
               </span>
               <BillStatusBadge bill={b} />
             </div>
             <div className="grid gap-1">
               <p className="text-sm font-semibold text-fg-muted">Amount</p>
-              <p className="text-4xl font-extrabold tracking-tight text-fg tabular">{formatMoney(b.amount)}</p>
+              <p className="text-4xl font-bold tracking-[-0.03em] text-fg tabular [font-variation-settings:'wdth'_108]">{formatMoney(b.amount)}</p>
             </div>
             <dl className="grid grid-cols-2 gap-x-6 gap-y-4 text-[13.5px]">
               <div className="grid gap-0.5">
@@ -164,7 +188,7 @@ export default function BillPage({ params }: { params: Promise<{ billId: string 
         ) : (
           <Panel className="grid content-start gap-4 p-6 sm:p-7 print:hidden">
             <ShieldCheck size={26} className="text-success" />
-            <p className="text-[15px] font-bold text-fg">How the demo checkout works</p>
+            <p className="text-[15px] font-semibold text-fg">How the demo checkout works</p>
             <ol className="grid list-decimal gap-2 pl-5 text-sm leading-relaxed text-fg-muted">
               <li>You confirm the amount. No payment details are asked for.</li>
               <li>The server records a simulated transaction and marks the bill paid in one database transaction.</li>
@@ -191,7 +215,7 @@ export default function BillPage({ params }: { params: Promise<{ billId: string 
             </div>
             <div className="flex justify-between gap-4 border-t border-line pt-3">
               <dt className="font-semibold text-fg">Amount</dt>
-              <dd className="text-lg font-extrabold text-fg tabular">{formatMoney(b.amount)}</dd>
+              <dd className="text-lg font-bold text-fg tabular">{formatMoney(b.amount)}</dd>
             </div>
           </dl>
           <FormError message={error} />

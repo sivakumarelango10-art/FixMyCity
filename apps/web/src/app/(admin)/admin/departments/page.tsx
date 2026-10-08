@@ -110,7 +110,7 @@ export default function DepartmentsPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="grid gap-1">
                     <p className="font-mono text-[11.5px] text-fg-subtle">{d.code}</p>
-                    <h2 className="text-[16px] font-extrabold leading-snug text-fg">{d.name}</h2>
+                    <h2 className="text-base font-semibold leading-snug text-fg">{d.name}</h2>
                   </div>
                   <Button variant="ghost" size="icon-sm" aria-label={`Edit ${d.name}`} onClick={() => setEditing(d)}>
                     <PencilSimple size={16} />
@@ -126,7 +126,7 @@ export default function DepartmentsPage() {
                   ].map(([k, v]) => (
                     <div key={String(k)} className="grid gap-0.5">
                       <dt className="text-[11.5px] text-fg-subtle">{k}</dt>
-                      <dd className="text-lg font-extrabold text-fg tabular">{v}</dd>
+                      <dd className="text-lg font-bold text-fg tabular">{v}</dd>
                     </div>
                   ))}
                 </dl>

@@ -19,7 +19,7 @@ function Browser() {
       showCitizen
       showDates
       departments={departments.data ?? []}
-      initialFilters={{ status: (params.get('status') as ComplaintStatus | null) ?? '' }}
+      initialFilters={{ status: (params.get('status') as ComplaintStatus | null) ?? '', departmentId: params.get('department') === 'unassigned' ? 'unassigned' : '' }}
       hrefFor={(c) => `/admin/complaints/${c.id}`}
     />
   );
