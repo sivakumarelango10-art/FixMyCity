@@ -2,11 +2,12 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { motion, useReducedMotion } from 'motion/react';
+import { motion } from 'motion/react';
 import { CaretRight } from '@phosphor-icons/react';
 import { CountUp } from '@/components/motion/reveal';
 import { Skeleton } from '@/components/ui/primitives';
 import { cn } from '@/lib/utils';
+import { useReducedMotionSafe } from '@/lib/hooks';
 
 export function Breadcrumbs({ items }: { items: { label: string; href?: string }[] }) {
   return (
@@ -152,7 +153,7 @@ export function StatCard({
   href?: string;
   index?: number;
 }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const body = (
     <div className="grid gap-2">
       <MetricBody m={{ label, value, icon, hint, tone }} loading={loading} />

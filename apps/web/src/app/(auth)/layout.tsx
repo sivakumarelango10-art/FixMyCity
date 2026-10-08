@@ -1,48 +1,50 @@
 import Link from 'next/link';
-import { CheckCircle } from '@phosphor-icons/react/dist/ssr';
+import Image from 'next/image';
 import { Logo } from '@/components/brand/logo';
 import { ThemeToggle } from '@/components/common/theme-toggle';
 
-const POINTS = [
-  'Report civic issues with a photo and a map pin',
-  'Follow every status change on one timeline',
-  'See utility bills and city notices in one place',
-];
-
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid min-h-dvh lg:grid-cols-[1fr_minmax(420px,0.9fr)]">
-      <div className="flex flex-col">
-        <header className="flex h-16 items-center justify-between px-5 sm:px-8">
+    <div className="grid min-h-dvh lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+      <div className="flex min-w-0 flex-col">
+        <header className="flex h-16 items-center justify-between px-4 sm:px-8">
           <Logo />
           <ThemeToggle />
         </header>
-        <main id="main" className="flex flex-1 items-center justify-center px-5 py-10 sm:px-8">
-          <div className="w-full max-w-[420px]">{children}</div>
+        <main id="main" className="flex flex-1 items-center justify-center px-4 py-10 sm:px-8">
+          <div className="w-full min-w-0 max-w-[420px]">{children}</div>
         </main>
-        <footer className="px-5 pb-6 text-[12.5px] text-fg-subtle sm:px-8">
+        <footer className="px-4 pb-6 text-caption text-fg-subtle sm:px-8">
           Hackathon prototype by team Kalvi Coder. Not an official municipal service.{' '}
-          <Link href="/about" className="font-semibold text-fg-muted hover:text-fg">
+          <Link href="/about" className="link">
             About
           </Link>
         </footer>
       </div>
-      <aside className="relative hidden overflow-hidden border-l border-line bg-surface lg:flex lg:flex-col lg:justify-between lg:p-12">
-        <div aria-hidden className="hairline-grid absolute inset-0 opacity-60 [mask-image:linear-gradient(to_bottom,black,transparent_85%)]" />
-        <div className="relative grid gap-6">
-          <p className="text-[13px] font-bold uppercase tracking-[0.16em] text-accent">One City. One Platform. Every Service.</p>
-          <p className="max-w-md text-3xl font-extrabold leading-tight tracking-[-0.03em] text-fg">
-            One account for the services your city already offers.
-          </p>
+
+      {/* Brand panel: what you get after signing in, shown with a real screenshot of the tracking page. */}
+      <aside className="relative hidden overflow-hidden border-l border-line bg-surface-2 lg:flex lg:flex-col lg:justify-between lg:gap-10 lg:py-14 lg:pl-14">
+        <div aria-hidden className="absolute inset-0 opacity-60 [background-image:linear-gradient(var(--border)_1px,transparent_1px),linear-gradient(90deg,var(--border)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:linear-gradient(to_bottom,black,transparent_70%)]" />
+        <div className="relative grid max-w-md gap-4 pr-14">
+          <p className="type-section text-fg">One account for the services your city already offers.</p>
+          <p className="text-[15px] leading-relaxed text-fg-muted">Report an issue, follow it from submission to resolution, and keep your bills and city notices in the same place.</p>
         </div>
-        <ul className="relative grid gap-4">
-          {POINTS.map((p) => (
-            <li key={p} className="flex items-start gap-3 text-[15px] text-fg-muted">
-              <CheckCircle size={20} weight="fill" className="mt-0.5 shrink-0 text-accent" />
-              {p}
-            </li>
-          ))}
-        </ul>
+        <figure className="relative grid gap-3">
+          <div className="overflow-hidden rounded-l-panel border border-r-0 border-line-strong bg-surface shadow-[var(--shadow-pop)]">
+            {(['dark', 'light'] as const).map((theme) => (
+              <Image
+                key={theme}
+                src={`/screens/complaint-tracking-${theme}.webp`}
+                alt="Complaint tracking page with the route from submitted to resolved and the activity timeline"
+                width={1440}
+                height={900}
+                sizes="50vw"
+                className={`aspect-[16/10] w-full object-cover object-left-top ${theme === 'dark' ? 'hidden dark:block' : 'block dark:hidden'}`}
+              />
+            ))}
+          </div>
+          <figcaption className="text-caption text-fg-subtle">The tracking page, shown with demo data.</figcaption>
+        </figure>
       </aside>
     </div>
   );

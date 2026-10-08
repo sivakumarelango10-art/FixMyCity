@@ -30,12 +30,12 @@ export default function ForgotPasswordPage() {
   return (
     <div className="grid gap-7">
       <div className="grid gap-2">
-        <h1 className="text-[1.75rem] font-extrabold tracking-[-0.025em] text-fg">Reset your password</h1>
+        <h1 className="type-page text-fg">Reset your password</h1>
         <p className="text-[15px] text-fg-muted">Enter your account email and we will send a link that is valid for 30 minutes.</p>
       </div>
       <AnimatePresence mode="wait">
         {sent ? (
-          <motion.div key="sent" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid gap-4 rounded-[var(--radius-panel)] border border-line bg-surface p-5" role="status">
+          <motion.div key="sent" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid gap-4 rounded-panel border border-line bg-surface p-5" role="status">
             <EnvelopeSimple size={28} className="text-accent" />
             <p className="font-bold text-fg">Check your inbox</p>
             <p className="text-sm leading-relaxed text-fg-muted">If an account exists for that email, a reset link is on its way.</p>
@@ -55,7 +55,7 @@ export default function ForgotPasswordPage() {
           </motion.form>
         )}
       </AnimatePresence>
-      <Link href="/login" className="text-sm font-semibold text-accent hover:underline">
+      <Link href="/login" className="link text-sm">
         Back to sign in
       </Link>
     </div>

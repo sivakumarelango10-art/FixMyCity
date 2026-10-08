@@ -2,8 +2,10 @@
 
 import * as React from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ImageSquare, Trash, UploadSimple } from '@phosphor-icons/react';
+import { Camera, ImageSquare, Trash, UploadSimple } from '@phosphor-icons/react';
 import { UPLOAD_LIMITS } from '@fixmycity/shared';
+import { Button } from '@/components/ui/button';
+import { FieldError } from '@/components/ui/field';
 import { cn } from '@/lib/utils';
 
 export interface PickedPhoto {
@@ -79,21 +81,21 @@ export function PhotoDropzone({
           if (e.dataTransfer.files.length) add(e.dataTransfer.files);
         }}
         className={cn(
-          'grid place-items-center gap-3 rounded-[var(--radius-panel)] border-2 border-dashed px-6 py-8 text-center transition-colors duration-150',
-          dragging ? 'border-accent bg-accent-soft' : message ? 'border-danger/50' : 'border-line-strong hover:border-fg-subtle',
+          'grid place-items-center gap-3 rounded-control border-2 border-dashed px-5 py-8 text-center transition-colors duration-150',
+          dragging ? 'border-accent bg-accent-soft' : message ? 'border-danger/50 bg-danger-soft' : 'border-line-strong bg-surface-2/50 hover:border-fg-subtle',
         )}
       >
-        <span className="grid h-12 w-12 place-items-center rounded-2xl bg-surface-2 text-accent">
+        <span className="grid h-12 w-12 place-items-center rounded-control border border-line bg-surface text-accent-text" aria-hidden>
           <UploadSimple size={22} weight="bold" />
         </span>
-        <div className="grid gap-1">
-          <p className="text-[15px] font-semibold text-fg">Drag photos here or</p>
-          <button type="button" onClick={() => inputRef.current?.click()} className="mx-auto text-[15px] font-bold text-accent hover:underline">
-            choose from your device
-          </button>
+        <div className="grid gap-2">
+          <p className="text-[15px] font-semibold text-fg">Drag photos here</p>
+          <Button type="button" variant="secondary" size="sm" className="mx-auto" onClick={() => inputRef.current?.click()}>
+            <Camera size={16} aria-hidden /> Take or choose a photo
+          </Button>
         </div>
-        <p className="text-[12.5px] text-fg-subtle">
-          JPEG, PNG or WebP, up to {UPLOAD_LIMITS.maxFileBytes / MB} MB each, {UPLOAD_LIMITS.maxFiles} photos max. Location data inside photos is removed.
+        <p className="max-w-sm text-xs leading-relaxed text-fg-subtle">
+          JPEG, PNG or WebP, up to {UPLOAD_LIMITS.maxFileBytes / MB} MB each, {UPLOAD_LIMITS.maxFiles} photos at most. Location data inside photos is removed.
         </p>
         <input
           ref={inputRef}
@@ -110,12 +112,8 @@ export function PhotoDropzone({
           }}
         />
       </div>
-      {message && (
-        <p id={`${id}-error`} role="alert" className="text-[13px] font-medium text-danger">
-          {message}
-        </p>
-      )}
-      <ul className="grid grid-cols-3 gap-3" aria-label="Selected photos">
+      {message && <FieldError id={`${id}-error`}>{message}</FieldError>}
+      <ul className="grid grid-cols-3 gap-2 sm:gap-3" aria-label="Selected photos">
         <AnimatePresence initial={false}>
           {photos.map((p) => (
             <motion.li
@@ -125,19 +123,19 @@ export function PhotoDropzone({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.94 }}
               transition={{ duration: 0.2 }}
-              className="group relative overflow-hidden rounded-[14px] border border-line"
+              className="group relative overflow-hidden rounded-control border border-line"
             >
               {/* eslint-disable-next-line @next/next/no-img-element -- local object URL preview */}
               <img src={p.preview} alt={`Selected photo ${p.file.name}`} className="aspect-square w-full object-cover" />
               <button
                 type="button"
                 onClick={() => remove(p.id)}
-                className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-[#050817]/70 text-white backdrop-blur transition-opacity hover:bg-[#050817]/90"
+                className="absolute right-1.5 top-1.5 grid h-9 w-9 place-items-center rounded-full bg-[#060b17]/75 text-white transition-colors hover:bg-[#060b17]/90"
                 aria-label={`Remove ${p.file.name}`}
               >
                 <Trash size={15} />
               </button>
-              <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-[#050817]/80 to-transparent px-2 pb-1.5 pt-4 text-[11px] text-white">
+              <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-[#060b17]/80 to-transparent px-2 pb-1.5 pt-4 text-[11px] text-white">
                 {(p.file.size / MB).toFixed(1)} MB
               </span>
             </motion.li>
@@ -145,7 +143,7 @@ export function PhotoDropzone({
         </AnimatePresence>
         {photos.length === 0 && (
           <li className="col-span-3 flex items-center gap-2 text-[13px] text-fg-subtle">
-            <ImageSquare size={16} /> At least one photo is required.
+            <ImageSquare size={16} aria-hidden /> No photo attached yet.
           </li>
         )}
       </ul>

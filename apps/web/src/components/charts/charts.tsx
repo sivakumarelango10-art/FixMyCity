@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { useReducedMotion } from 'motion/react';
 import {
   Bar,
   BarChart,
@@ -17,6 +16,7 @@ import {
 import { Table } from '@phosphor-icons/react';
 import { Panel, PanelHeader, Skeleton } from '@/components/ui/primitives';
 import { cn } from '@/lib/utils';
+import { useReducedMotionSafe } from '@/lib/hooks';
 
 /*
  * Chart conventions (see the dataviz pass in docs/UI_UX_AUDIT.md):
@@ -28,7 +28,7 @@ import { cn } from '@/lib/utils';
 const AXIS = { fontSize: 12, fill: 'var(--fg-subtle)' };
 
 function useChartAnimation() {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   return { isAnimationActive: !reduce, animationDuration: 650, animationEasing: 'ease-out' as const };
 }
 
@@ -48,7 +48,7 @@ const tip = (p: unknown, extra: Partial<TipProps> = {}) => {
 function TooltipCard({ active, payload, label, formatter }: TipProps) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="min-w-[150px] rounded-[12px] border border-line bg-surface px-3 py-2.5 text-[12.5px] shadow-[var(--shadow-pop)]">
+    <div className="min-w-[150px] rounded-control border border-line bg-surface px-3 py-2.5 text-[12.5px] shadow-[var(--shadow-pop)]">
       {label !== undefined && <p className="mb-1.5 font-semibold text-fg">{String(label)}</p>}
       <ul className="grid gap-1">
         {payload.map((p) => (
@@ -106,7 +106,7 @@ export function ChartPanel({ title, description, loading, empty, emptyLabel = 'N
             onClick={() => setShowTable((s) => !s)}
             aria-pressed={showTable}
             aria-controls={id}
-            className="inline-flex h-8 items-center gap-1.5 rounded-[10px] px-2.5 text-xs font-semibold text-fg-subtle transition-colors hover:bg-surface-2 hover:text-fg"
+            className="inline-flex h-8 items-center gap-1.5 rounded-control px-2.5 text-xs font-semibold text-fg-subtle transition-colors hover:bg-surface-2 hover:text-fg"
           >
             <Table size={14} /> {showTable ? 'Chart' : 'Table'}
           </button>
@@ -119,7 +119,7 @@ export function ChartPanel({ title, description, loading, empty, emptyLabel = 'N
           </div>
         )}
         {loading ? (
-          <Skeleton className="mx-2 rounded-[12px]" style={{ height }} />
+          <Skeleton className="mx-2 rounded-control" style={{ height }} />
         ) : empty ? (
           <div className="grid place-items-center text-sm text-fg-subtle" style={{ height }}>
             {emptyLabel}

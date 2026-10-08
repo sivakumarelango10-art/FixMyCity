@@ -40,23 +40,38 @@ export function useMarkAllRead() {
   });
 }
 
+/** One notification: type glyph, title, message and time. Unread rows are tinted and marked. */
 export function NotificationRow({ n, onOpen }: { n: NotificationDto; onOpen?: (n: NotificationDto) => void }) {
   const Icon = NOTIFICATION_ICONS[n.type];
   return (
     <button
       type="button"
       onClick={() => onOpen?.(n)}
-      className={cn('flex w-full gap-3 rounded-[12px] px-3 py-3 text-left transition-colors hover:bg-surface-2', !n.isRead && 'bg-accent-soft/50')}
+      className={cn('flex w-full gap-3 rounded-control px-3 py-3 text-left transition-colors hover:bg-surface-2', !n.isRead && 'bg-accent-soft/60 hover:bg-accent-soft')}
     >
-      <span className={cn('mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-[10px]', n.isRead ? 'bg-surface-2 text-fg-subtle' : 'bg-accent-soft text-accent')}>
-        <Icon size={16} weight="bold" />
+      <span
+        className={cn(
+          'mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-control border',
+          n.isRead ? 'border-line bg-surface-2 text-fg-subtle' : 'border-accent-line bg-surface text-accent-text',
+        )}
+        aria-hidden
+      >
+        <Icon size={17} weight="bold" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className={cn('block text-[13.5px] leading-snug', n.isRead ? 'font-medium text-fg-muted' : 'font-bold text-fg')}>{n.title}</span>
-        <span className="mt-0.5 line-clamp-2 block text-[12.5px] leading-relaxed text-fg-subtle">{n.message}</span>
-        <span className="mt-1 block text-[11.5px] text-fg-subtle">{timeAgo(n.createdAt)}</span>
+        <span className={cn('block text-sm leading-snug', n.isRead ? 'font-medium text-fg-muted' : 'font-semibold text-fg')}>{n.title}</span>
+        <span className="mt-0.5 line-clamp-2 block text-[13px] leading-relaxed text-fg-subtle">{n.message}</span>
+        <span className="mt-1 block text-xs text-fg-subtle">
+          <time dateTime={n.createdAt}>{timeAgo(n.createdAt)}</time>
+          {n.link ? <span className="text-accent-text">, open</span> : null}
+        </span>
       </span>
-      {!n.isRead && <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-accent" aria-label="Unread" />}
+      {!n.isRead && (
+        <span className="mt-2 flex shrink-0 items-center">
+          <span className="h-2 w-2 rounded-full bg-accent" aria-hidden />
+          <span className="sr-only">Unread</span>
+        </span>
+      )}
     </button>
   );
 }
@@ -94,7 +109,7 @@ export function NotificationBell() {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.4, opacity: 0 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 24 }}
-                className="absolute right-1 top-1 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-accent px-1 text-[10.5px] font-bold text-accent-fg tabular"
+                className="absolute right-1.5 top-1.5 grid h-[18px] min-w-[18px] place-items-center rounded-full border-2 border-bg bg-accent px-1 text-[10px] font-bold leading-none text-accent-fg tabular"
               >
                 {count > 99 ? '99+' : count}
               </motion.span>
@@ -103,13 +118,15 @@ export function NotificationBell() {
         </Button>
       </PopoverTrigger>
       <PopoverContent>
-        <div className="flex items-center justify-between border-b border-line px-4 py-3">
-          <p className="text-sm font-bold text-fg">Notifications</p>
+        <div className="flex items-center justify-between border-b border-line py-2 pl-4 pr-2">
+          <p className="text-sm font-semibold text-fg">
+            Notifications{count > 0 && <span className="ml-1.5 font-medium text-fg-subtle">{count} unread</span>}
+          </p>
           <Button variant="ghost" size="sm" disabled={count === 0 || markAll.isPending} onClick={() => markAll.mutate()}>
             <Checks size={15} /> Mark all read
           </Button>
         </div>
-        <div className="max-h-[420px] overflow-y-auto p-2">
+        <div className="max-h-[min(440px,60dvh)] overflow-y-auto p-1.5">
           {list.isLoading ? (
             <div className="grid gap-2 p-2">
               {[0, 1, 2].map((i) => (
@@ -119,12 +136,12 @@ export function NotificationBell() {
           ) : list.data && list.data.data.length > 0 ? (
             list.data.data.map((n) => <NotificationRow key={n.id} n={n} onOpen={openNotification} />)
           ) : (
-            <EmptyState icon={<Bell size={22} />} title="You are all caught up" description="Updates about your complaints and the city appear here." />
+            <EmptyState icon={<Bell size={22} />} title="You are all caught up" description="Status changes on your work and new city notices will appear here." className="py-10" />
           )}
         </div>
         <div className="border-t border-line p-2">
           <PopoverClose asChild>
-            <Link href={notificationsPathForRole(user.role)} className="block rounded-[10px] px-3 py-2 text-center text-[13px] font-semibold text-accent hover:bg-surface-2">
+            <Link href={notificationsPathForRole(user.role)} className="flex min-h-10 items-center justify-center rounded-control px-3 text-[13px] font-semibold text-accent-text hover:bg-surface-2">
               View all notifications
             </Link>
           </PopoverClose>

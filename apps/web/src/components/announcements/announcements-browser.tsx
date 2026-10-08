@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'motion/react';
-import { MagnifyingGlass, Megaphone, PushPin } from '@phosphor-icons/react';
+import { Barricade, CalendarBlank, Info, MagnifyingGlass, Megaphone, PushPin, Warning, Wrench, type Icon } from '@phosphor-icons/react';
 import { subDays, format } from 'date-fns';
 import { ANNOUNCEMENT_CATEGORIES, ANNOUNCEMENT_CATEGORY_LABELS, type AnnouncementCategory, type AnnouncementDto } from '@fixmycity/shared';
 import { FilterChips } from '@/components/common/page';
@@ -14,16 +14,35 @@ import { Select } from '@/components/ui/select';
 import { api, toQuery } from '@/lib/api';
 import { usePageReset } from '@/lib/hooks';
 import { qk } from '@/lib/query-keys';
-import { formatDate, timeAgo } from '@/lib/utils';
+import { cn, formatDate, timeAgo } from '@/lib/utils';
 
+/* Only urgent kinds of notice carry color; everything else stays neutral so they stand out. */
 const CATEGORY_TONE: Record<AnnouncementCategory, 'neutral' | 'accent' | 'success' | 'warning' | 'danger'> = {
   GENERAL: 'neutral',
-  SERVICE_UPDATE: 'accent',
+  SERVICE_UPDATE: 'neutral',
   MAINTENANCE: 'warning',
   EMERGENCY: 'danger',
-  EVENT: 'success',
-  ADVISORY: 'accent',
+  EVENT: 'neutral',
+  ADVISORY: 'neutral',
 };
+
+const CATEGORY_ICON: Record<AnnouncementCategory, Icon> = {
+  GENERAL: Info,
+  SERVICE_UPDATE: Wrench,
+  MAINTENANCE: Barricade,
+  EMERGENCY: Warning,
+  EVENT: CalendarBlank,
+  ADVISORY: Megaphone,
+};
+
+function CategoryTag({ category }: { category: AnnouncementCategory }) {
+  const Icon = CATEGORY_ICON[category];
+  return (
+    <Badge tone={CATEGORY_TONE[category]}>
+      <Icon size={12} weight="bold" aria-hidden /> {ANNOUNCEMENT_CATEGORY_LABELS[category]}
+    </Badge>
+  );
+}
 
 const RANGES = [
   { value: '', label: 'Any time' },
@@ -41,29 +60,42 @@ function useDebounced<T>(value: T, ms = 300) {
   return v;
 }
 
+/** One notice on the board: date block, tags, title and summary. Opens the full notice. */
 export function AnnouncementCard({ a, onOpen }: { a: AnnouncementDto; onOpen: (a: AnnouncementDto) => void }) {
+  const urgent = a.category === 'EMERGENCY';
+  const date = a.publishedAt ?? a.createdAt;
   return (
-    <motion.li layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
+    <motion.li layout initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.22 }}>
       <button
         type="button"
         onClick={() => onOpen(a)}
-        className="panel grid h-full w-full content-start gap-3 p-5 text-left transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-line-strong"
+        className={cn(
+          'group relative grid w-full grid-cols-[52px_minmax(0,1fr)] gap-4 px-4 py-5 text-left transition-colors hover:bg-surface-2 sm:grid-cols-[60px_minmax(0,1fr)] sm:px-6',
+          (a.pinned || urgent) && 'before:absolute before:inset-y-3 before:left-0 before:w-[3px] before:rounded-r-full',
+          urgent ? 'bg-danger-soft/60 before:bg-danger' : a.pinned && 'before:bg-accent',
+        )}
       >
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge tone={CATEGORY_TONE[a.category]}>{ANNOUNCEMENT_CATEGORY_LABELS[a.category]}</Badge>
-          {a.pinned && (
-            <Badge tone="accent">
-              <PushPin size={11} weight="fill" /> Featured
-            </Badge>
-          )}
-          {a.isDemo && <Badge>Demo notice</Badge>}
-        </div>
-        <h3 className="text-[16px] font-bold leading-snug text-fg">{a.title}</h3>
-        {a.summary && <p className="line-clamp-3 text-sm leading-relaxed text-fg-muted">{a.summary}</p>}
-        <p className="text-xs text-fg-subtle">
-          Published {timeAgo(a.publishedAt)}
-          {a.expiresAt ? `, until ${formatDate(a.expiresAt)}` : ''}
-        </p>
+        <span className="grid h-[52px] content-center justify-items-center rounded-control border border-line bg-surface text-center sm:h-[60px]" aria-hidden>
+          <span className="text-lg font-bold leading-none text-fg tabular sm:text-xl">{formatDate(date, 'd')}</span>
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-fg-subtle">{formatDate(date, 'MMM')}</span>
+        </span>
+        <span className="grid min-w-0 gap-1.5">
+          <span className="flex flex-wrap items-center gap-1.5">
+            <CategoryTag category={a.category} />
+            {a.pinned && (
+              <Badge tone="accent">
+                <PushPin size={11} weight="fill" aria-hidden /> Featured
+              </Badge>
+            )}
+            {a.isDemo && <Badge>Demo notice</Badge>}
+          </span>
+          <span className="text-base font-semibold leading-snug text-fg group-hover:text-accent-text">{a.title}</span>
+          {a.summary && <span className="line-clamp-2 text-sm leading-relaxed text-fg-muted">{a.summary}</span>}
+          <span className="text-xs text-fg-subtle">
+            Published {timeAgo(a.publishedAt)}
+            {a.expiresAt ? `, valid until ${formatDate(a.expiresAt)}` : ''}
+          </span>
+        </span>
       </button>
     </motion.li>
   );
@@ -75,7 +107,7 @@ export function AnnouncementDialog({ a, onClose }: { a: AnnouncementDto | null; 
       {a && (
         <DialogContent title={a.title} description={a.summary ?? undefined} className="max-w-2xl">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge tone={CATEGORY_TONE[a.category]}>{ANNOUNCEMENT_CATEGORY_LABELS[a.category]}</Badge>
+            <CategoryTag category={a.category} />
             {a.isDemo && <Badge>Demonstration notice, not an official announcement</Badge>}
           </div>
           <p className="whitespace-pre-line text-[15px] leading-relaxed text-fg">{a.content}</p>
@@ -134,7 +166,7 @@ export function AnnouncementsBrowser({ initialOpenId }: { initialOpenId?: string
 
   return (
     <div className="grid gap-6">
-      <div className="grid gap-4 lg:grid-cols-[minmax(240px,360px)_1fr_auto] lg:items-center">
+      <div className="grid gap-3 lg:grid-cols-[minmax(240px,340px)_minmax(0,1fr)_auto] lg:items-center">
         <div className="relative">
           <MagnifyingGlass size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-fg-subtle" />
           <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search notices" aria-label="Search announcements" className="pl-10" />
@@ -149,19 +181,33 @@ export function AnnouncementsBrowser({ initialOpenId }: { initialOpenId?: string
       </div>
 
       {query.isError ? (
-        <ErrorState message={(query.error as Error).message} onRetry={() => query.refetch()} className="panel" />
+        <ErrorState title="City updates could not be loaded" message={(query.error as Error).message} onRetry={() => query.refetch()} className="panel" />
       ) : query.isLoading ? (
-        <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="panel divide-y divide-line" role="status" aria-label="Loading notices">
           {[0, 1, 2].map((i) => (
-            <li key={i}>
-              <Skeleton className="h-44 rounded-[var(--radius-panel)]" />
-            </li>
+            <div key={i} className="grid grid-cols-[52px_1fr] gap-4 px-4 py-5 sm:grid-cols-[60px_1fr] sm:px-6">
+              <Skeleton className="h-[52px] sm:h-[60px]" />
+              <div className="grid gap-2">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-5 w-2/3" />
+                <Skeleton className="h-4 w-full" />
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       ) : items.length === 0 ? (
-        <EmptyState className="panel" icon={<Megaphone size={22} />} title="No notices match" description="Try a different search, category or date range." />
+        <EmptyState
+          className="panel"
+          icon={<Megaphone size={22} />}
+          title={search || category || range ? 'No notices match' : 'No current notices'}
+          description={
+            search || category || range
+              ? 'Nothing matches this search, category or date range. Try widening it.'
+              : 'Administrators have not published any notices that are still valid. Check back later.'
+          }
+        />
       ) : (
-        <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <ul className="panel divide-y divide-line overflow-hidden">
           <AnimatePresence initial={false}>
             {items.map((a) => (
               <AnnouncementCard key={a.id} a={a} onOpen={setOpen} />
@@ -171,7 +217,9 @@ export function AnnouncementsBrowser({ initialOpenId }: { initialOpenId?: string
       )}
 
       {query.data && query.data.meta.totalPages > 1 && (
-        <Pagination page={page} totalPages={query.data.meta.totalPages} total={query.data.meta.total} onPageChange={setPage} label="notices" />
+        <div className="panel">
+          <Pagination page={page} totalPages={query.data.meta.totalPages} total={query.data.meta.total} onPageChange={setPage} label="notices" />
+        </div>
       )}
       <AnnouncementDialog
         a={shown}

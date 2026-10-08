@@ -1,13 +1,14 @@
 'use client';
 
 import * as React from 'react';
-import { motion, useReducedMotion, type HTMLMotionProps } from 'motion/react';
+import { motion, type HTMLMotionProps } from 'motion/react';
+import { useReducedMotionSafe } from '@/lib/hooks';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 /** Fades content up once as it enters the viewport. Static under reduced motion. */
 export function Reveal({ delay = 0, y = 20, children, ...props }: HTMLMotionProps<'div'> & { delay?: number; y?: number }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   return (
     <motion.div
       initial={reduce ? false : { opacity: 0, y }}
@@ -33,7 +34,7 @@ export const staggerChild = {
 
 /** Animated integer that counts up when it changes. */
 export function CountUp({ value, className }: { value: number; className?: string }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [display, setDisplay] = React.useState(reduce ? value : 0);
   const from = React.useRef(0);
   React.useEffect(() => {

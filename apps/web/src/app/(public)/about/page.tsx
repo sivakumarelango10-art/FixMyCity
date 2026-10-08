@@ -15,10 +15,10 @@ const FACTS = [
 
 export default function AboutPage() {
   return (
-    <div className="container-page grid gap-16 py-14 lg:py-20">
+    <div className="container-page grid gap-16 py-12 md:py-16">
       <header className="grid max-w-3xl gap-4">
-        <h1 className="text-4xl font-extrabold tracking-[-0.035em] text-fg md:text-5xl">About FixMyCity</h1>
-        <p className="text-lg leading-relaxed text-fg-muted">
+        <h1 className="type-section text-fg">About FixMyCity</h1>
+        <p className="type-lead">
           FixMyCity is an intelligent unified platform for urban services, built for a hackathon by team Kalvi Coder. It is a working prototype, not an official
           municipal service.
         </p>
@@ -27,25 +27,25 @@ export default function AboutPage() {
       <section className="grid gap-x-12 gap-y-10 md:grid-cols-2">
         {FACTS.map((f) => (
           <div key={f.title} className="grid content-start gap-2 border-t border-line pt-5">
-            <h2 className="text-lg font-extrabold text-fg">{f.title}</h2>
+            <h2 className="text-lg font-semibold tracking-[-0.015em] text-fg">{f.title}</h2>
             <p className="text-[15px] leading-relaxed text-fg-muted">{f.body}</p>
           </div>
         ))}
       </section>
 
       <section className="grid gap-5">
-        <h2 className="text-2xl font-extrabold tracking-tight text-fg">Team Kalvi Coder</h2>
+        <h2 className="text-2xl font-semibold tracking-[-0.02em] text-fg">Team Kalvi Coder</h2>
         <ul className="flex flex-wrap gap-3">
           {TEAM.map((name) => (
-            <li key={name} className="rounded-full border border-line bg-surface px-4 py-2 text-sm font-semibold text-fg">
+            <li key={name} className="rounded-chip border border-line bg-surface px-3.5 py-2 text-sm font-semibold text-fg">
               {name}
             </li>
           ))}
         </ul>
       </section>
 
-      <section className="grid gap-4 rounded-[var(--radius-panel)] border border-line bg-surface p-7">
-        <p className="max-w-3xl text-xl font-bold leading-snug text-fg">
+      <section className="grid gap-5 rounded-panel border border-accent-line bg-accent-soft px-6 py-8 sm:px-8">
+        <p className="max-w-3xl text-xl font-semibold leading-snug tracking-[-0.015em] text-fg">
           A smarter city isn&apos;t just a city with more technology. It&apos;s a city where essential services work together for everyone.
         </p>
         <div className="flex flex-wrap gap-3">

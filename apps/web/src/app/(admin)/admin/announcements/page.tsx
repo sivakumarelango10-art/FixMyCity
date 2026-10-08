@@ -119,7 +119,7 @@ function AnnouncementForm({ existing, onDone }: { existing?: AnnouncementDto; on
           <Input type="datetime-local" {...form.register('expiresAt')} />
         </Field>
       </div>
-      <label className="flex items-center justify-between gap-4 rounded-[12px] border border-line px-4 py-3">
+      <label className="flex items-center justify-between gap-4 rounded-control border border-line px-4 py-3">
         <span className="grid">
           <span className="text-sm font-semibold text-fg">Feature this notice</span>
           <span className="text-xs text-fg-subtle">Featured and emergency notices also notify citizens when they go live.</span>

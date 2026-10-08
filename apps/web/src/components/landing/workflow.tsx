@@ -1,9 +1,10 @@
 'use client';
 
-import { motion, useReducedMotion } from 'motion/react';
+import { motion } from 'motion/react';
 import { REOPEN_WINDOW_DAYS, STATUS_LABELS, STATUS_PROGRESSION, type ComplaintStatus } from '@fixmycity/shared';
 import { STATUS_ICONS } from '@/components/common/complaint-meta';
 import { Reveal } from '@/components/motion/reveal';
+import { useReducedMotionSafe } from '@/lib/hooks';
 
 /* What actually happens at each station, and who acts. Mirrors the API workflow. */
 const STOPS: Partial<Record<ComplaintStatus, { who: string; body: string }>> = {
@@ -14,7 +15,7 @@ const STOPS: Partial<Record<ComplaintStatus, { who: string; body: string }>> = {
 };
 
 export function Workflow() {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   return (
     <section id="how-it-works" className="scroll-mt-20 border-y border-line bg-surface py-16 md:py-24">
       <div className="container-page grid gap-12 md:gap-16">

@@ -10,7 +10,7 @@ export default function NewComplaintPage() {
       <PageHeader
         breadcrumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Report an Issue' }]}
         title="Report an issue"
-        description="Describe the problem, add a photo and pin the location. You will get a tracking ID straight away."
+        description="Four short steps: what happened, what kind of problem, a photo, and where. You get a tracking ID the moment you submit."
       />
       <ReportForm />
     </>

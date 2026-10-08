@@ -40,7 +40,7 @@ export default function AdminUtilitiesPage() {
                   const Icon = SERVICE_ICONS[s.serviceType];
                   return (
                     <li key={s.serviceType} className="grid grid-cols-[36px_1fr_auto] items-center gap-3">
-                      <span className="grid h-9 w-9 place-items-center rounded-[10px] bg-surface-2 text-fg-muted">
+                      <span className="grid h-9 w-9 place-items-center rounded-control bg-surface-2 text-fg-muted">
                         <Icon size={17} />
                       </span>
                       <span className="grid">

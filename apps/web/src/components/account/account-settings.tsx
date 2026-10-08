@@ -102,7 +102,7 @@ function ThemePanel() {
               aria-checked={active}
               onClick={() => setTheme(value)}
               className={cn(
-                'grid justify-items-center gap-2 rounded-[14px] border px-3 py-4 text-sm font-semibold transition-colors',
+                'grid justify-items-center gap-2 rounded-panel border px-3 py-4 text-sm font-semibold transition-colors',
                 active ? 'border-accent bg-accent-soft text-fg' : 'border-line text-fg-muted hover:border-line-strong hover:text-fg',
               )}
             >
@@ -179,7 +179,7 @@ function SessionsPanel() {
         ) : (
           <ul className="grid gap-2">
             {(sessions.data ?? []).map((s) => (
-              <li key={s.id} className="flex flex-wrap items-center justify-between gap-3 rounded-[12px] border border-line px-4 py-3">
+              <li key={s.id} className="flex flex-wrap items-center justify-between gap-3 rounded-control border border-line px-4 py-3">
                 <span className="flex items-center gap-3">
                   <Monitor size={20} className="text-fg-subtle" />
                   <span className="grid">

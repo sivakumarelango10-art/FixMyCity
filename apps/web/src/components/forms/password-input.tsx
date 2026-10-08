@@ -12,7 +12,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, React.InputHTMLA
       <button
         type="button"
         onClick={() => setVisible((v) => !v)}
-        className="absolute right-1.5 top-1/2 grid h-8 w-9 -translate-y-1/2 place-items-center rounded-[8px] text-fg-subtle transition-colors hover:bg-surface-2 hover:text-fg"
+        className="absolute right-1.5 top-1/2 grid h-8 w-9 -translate-y-1/2 place-items-center rounded-chip text-fg-subtle transition-colors hover:bg-surface-2 hover:text-fg"
         aria-label={visible ? 'Hide password' : 'Show password'}
         aria-pressed={visible}
       >

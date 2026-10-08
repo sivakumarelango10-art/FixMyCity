@@ -75,7 +75,7 @@ export default function AnalyticsPage() {
             {a && a.repeatHotspots.length > 0 ? (
               <ul className="grid gap-3">
                 {a.repeatHotspots.map((h) => (
-                  <li key={`${h.address}-${h.category}`} className="flex items-center justify-between gap-4 rounded-[12px] bg-surface-2 px-4 py-3">
+                  <li key={`${h.address}-${h.category}`} className="flex items-center justify-between gap-4 rounded-control bg-surface-2 px-4 py-3">
                     <span className="grid min-w-0">
                       <span className="truncate text-[13.5px] font-semibold text-fg">{h.address}</span>
                       <span className="text-xs text-fg-subtle">{CATEGORY_META[h.category].label}</span>

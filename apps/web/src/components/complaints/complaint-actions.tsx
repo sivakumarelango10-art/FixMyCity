@@ -244,7 +244,7 @@ export function StatusActions({ complaint, allowPhotos }: { complaint: Complaint
                     accept={UPLOAD_LIMITS.allowedMimeTypes.join(',')}
                     multiple
                     onChange={(e) => setFiles(Array.from(e.target.files ?? []).slice(0, UPLOAD_LIMITS.maxFiles))}
-                    className="block w-full text-sm text-fg-muted file:mr-3 file:rounded-[10px] file:border file:border-line file:bg-surface-2 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-fg"
+                    className="block w-full text-sm text-fg-muted file:mr-3 file:rounded-control file:border file:border-line file:bg-surface-2 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-fg"
                   />
                 </Field>
               )}
@@ -302,7 +302,7 @@ export function NoteComposer({ complaint }: { complaint: ComplaintDetail }) {
           if (body.trim().length >= 2) add.mutate();
         }}
       >
-        <div role="radiogroup" aria-label="Who can see this note" className="grid grid-cols-2 gap-1 rounded-[12px] border border-line bg-surface-2 p-1">
+        <div role="radiogroup" aria-label="Who can see this note" className="grid grid-cols-2 gap-1 rounded-control border border-line bg-surface-2 p-1">
           {(
             [
               { v: 'PUBLIC', label: 'Public', icon: Megaphone },
@@ -316,7 +316,7 @@ export function NoteComposer({ complaint }: { complaint: ComplaintDetail }) {
               aria-checked={visibility === v}
               onClick={() => setVisibility(v)}
               className={cn(
-                'flex h-9 items-center justify-center gap-1.5 rounded-[9px] text-[13px] font-semibold transition-colors',
+                'flex h-9 items-center justify-center gap-1.5 rounded-chip text-[13px] font-semibold transition-colors',
                 visibility === v ? 'bg-surface text-fg shadow-[var(--shadow-panel)]' : 'text-fg-muted hover:text-fg',
               )}
             >
@@ -406,7 +406,7 @@ export function CitizenFollowUp({ complaint }: { complaint: ComplaintDetail }) {
                   aria-checked={rating === i}
                   aria-label={`${i} star${i > 1 ? 's' : ''}`}
                   onClick={() => setRating(i)}
-                  className="rounded-[8px] p-1 text-warning transition-transform hover:scale-110"
+                  className="rounded-chip p-1 text-warning transition-transform hover:scale-110"
                 >
                   <Star size={24} weight={i <= rating ? 'fill' : 'regular'} />
                 </button>

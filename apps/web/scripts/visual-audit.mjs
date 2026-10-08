@@ -109,7 +109,8 @@ try {
           const page = await context.newPage();
           const issues = { console: [], pageErrors: [], failed: [] };
           page.on('console', (m) => {
-            if (m.type() === 'error' || m.type() === 'warning') issues.console.push(`${m.type()}: ${m.text().slice(0, 300)}`);
+            // Motion's dev-only notice is expected: the audit runs with reduced motion on purpose.
+            if ((m.type() === 'error' || m.type() === 'warning') && !m.text().includes('Reduced Motion enabled')) issues.console.push(`${m.type()}: ${m.text().slice(0, 300)}`);
           });
           page.on('pageerror', (e) => issues.pageErrors.push(e.message.slice(0, 300)));
           page.on('requestfailed', (r) => {

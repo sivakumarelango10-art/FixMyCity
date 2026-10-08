@@ -63,7 +63,7 @@ export function AuditRow({ e, expandable }: { e: AuditLogDto; expandable?: boole
   const link = entityLink(e);
   const detail = summary(e);
   return (
-    <li className="rounded-[12px] px-3 py-3 transition-colors hover:bg-surface-2/70">
+    <li className="rounded-control px-3 py-3 transition-colors hover:bg-surface-2/70">
       <div className="grid gap-1 sm:grid-cols-[1fr_auto] sm:items-start sm:gap-4">
         <div className="grid min-w-0 gap-0.5">
           <p className="text-[13.5px] text-fg">
@@ -88,7 +88,7 @@ export function AuditRow({ e, expandable }: { e: AuditLogDto; expandable?: boole
               type="button"
               onClick={() => setOpen((o) => !o)}
               aria-expanded={open}
-              className="inline-flex items-center gap-1 rounded-[8px] px-1.5 py-0.5 text-[11.5px] font-semibold text-fg-subtle hover:bg-surface-3 hover:text-fg"
+              className="inline-flex items-center gap-1 rounded-chip px-1.5 py-0.5 text-[11.5px] font-semibold text-fg-subtle hover:bg-surface-3 hover:text-fg"
             >
               Details <CaretDown size={11} className={cn('transition-transform', open && 'rotate-180')} />
             </button>
@@ -96,7 +96,7 @@ export function AuditRow({ e, expandable }: { e: AuditLogDto; expandable?: boole
         </div>
       </div>
       {open && (
-        <pre className="relative mt-2 overflow-x-auto rounded-[10px] bg-surface-2 p-3 font-mono text-[11.5px] leading-relaxed text-fg-muted">
+        <pre className="relative mt-2 overflow-x-auto rounded-control bg-surface-2 p-3 font-mono text-[11.5px] leading-relaxed text-fg-muted">
           {JSON.stringify({ action: e.action, entity: `${e.entityType}${e.entityId ? `:${e.entityId}` : ''}`, ...e.metadata }, null, 2)}
         </pre>
       )}

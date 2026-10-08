@@ -57,7 +57,7 @@ function DepartmentForm({ dept, onDone }: { dept?: DepartmentDto; onDone: () => 
       <Field id="dept-email" label="Contact email" optional error={form.formState.errors.contactEmail?.message}>
         <Input type="email" {...form.register('contactEmail')} />
       </Field>
-      <label className="flex items-center justify-between gap-4 rounded-[12px] border border-line px-4 py-3">
+      <label className="flex items-center justify-between gap-4 rounded-control border border-line px-4 py-3">
         <span className="grid">
           <span className="text-sm font-semibold text-fg">Accepting assignments</span>
           <span className="text-xs text-fg-subtle">Inactive departments cannot receive new complaints.</span>
@@ -97,7 +97,7 @@ export default function DepartmentsPage() {
       ) : q.isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-56 rounded-[var(--radius-panel)]" />
+            <Skeleton key={i} className="h-56 rounded-panel" />
           ))}
         </div>
       ) : (q.data ?? []).length === 0 ? (

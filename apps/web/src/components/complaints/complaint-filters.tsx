@@ -140,12 +140,12 @@ export function ComplaintFilters({
             <label className="sr-only" htmlFor="filter-from">
               Submitted from
             </label>
-            <Input id="filter-from" type="date" value={value.from} onChange={(e) => set('from', e.target.value)} className="h-9 w-auto rounded-[10px] px-3 text-[13px]" />
+            <Input id="filter-from" type="date" value={value.from} onChange={(e) => set('from', e.target.value)} className="h-9 w-auto rounded-control px-3 text-[13px]" />
             <span className="text-xs text-fg-subtle">to</span>
             <label className="sr-only" htmlFor="filter-to">
               Submitted to
             </label>
-            <Input id="filter-to" type="date" value={value.to} onChange={(e) => set('to', e.target.value)} className="h-9 w-auto rounded-[10px] px-3 text-[13px]" />
+            <Input id="filter-to" type="date" value={value.to} onChange={(e) => set('to', e.target.value)} className="h-9 w-auto rounded-control px-3 text-[13px]" />
           </>
         )}
         {active && (

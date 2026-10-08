@@ -86,7 +86,7 @@ export default function UtilitiesPage() {
                 const Icon = SERVICE_ICONS[type];
                 return (
                   <li key={type} className="flex items-center gap-3">
-                    <span className="grid h-9 w-9 place-items-center rounded-[10px] bg-surface-2 text-fg-muted">
+                    <span className="grid h-9 w-9 place-items-center rounded-control bg-surface-2 text-fg-muted">
                       <Icon size={17} />
                     </span>
                     <span className="grid min-w-0">
@@ -107,7 +107,7 @@ export default function UtilitiesPage() {
                 <ul className="grid gap-3">
                   {payments.data.map((p) => (
                     <li key={p.id}>
-                      <Link href={`/dashboard/utilities/${p.billId}`} className="flex items-center justify-between gap-3 rounded-[10px] px-2 py-1.5 hover:bg-surface-2">
+                      <Link href={`/dashboard/utilities/${p.billId}`} className="flex items-center justify-between gap-3 rounded-control px-2 py-1.5 hover:bg-surface-2">
                         <span className="grid min-w-0">
                           <span className="text-[13.5px] font-semibold text-fg">
                             {UTILITY_LABELS[p.serviceType].label}, {p.billingPeriod}

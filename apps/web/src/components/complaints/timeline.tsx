@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useReducedMotion } from 'motion/react';
+import { motion } from 'motion/react';
 import { ChatCircleText, Check, LockSimple, Signpost, Star } from '@phosphor-icons/react';
 import {
   ROLE_LABELS,
@@ -12,6 +12,7 @@ import {
 } from '@fixmycity/shared';
 import { STATUS_ICONS, STATUS_STYLES, StatusBadge } from '@/components/common/complaint-meta';
 import { cn, formatDateTime, timeAgo } from '@/lib/utils';
+import { useReducedMotionSafe } from '@/lib/hooks';
 
 /*
  * The route: every report travels the same line of stations,
@@ -28,7 +29,7 @@ export function routePosition(status: ComplaintStatus) {
 
 /** Full route with stations, labels and when each was reached. */
 export function ProgressRail({ status, timeline }: { status: ComplaintStatus; timeline: TimelineEvent[] }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const { offTrack, index } = routePosition(status);
   const last = STATUS_PROGRESSION.length - 1;
   const reachedAt = (s: ComplaintStatus) => [...timeline].reverse().find((e) => e.toStatus === s)?.createdAt;
@@ -149,7 +150,7 @@ function describe(event: TimelineEvent): { title: string; body?: string | null }
 
 /** Chronological activity feed built from persisted history. Newest last, matching how the work happened. */
 export function ComplaintTimeline({ events, staffView = false }: { events: TimelineEvent[]; staffView?: boolean }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   return (
     <ol className="relative grid gap-0" aria-label="Activity timeline">
       {events.map((event, i) => {

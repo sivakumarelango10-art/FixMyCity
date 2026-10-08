@@ -146,7 +146,7 @@ function EditUserForm({ user, onDone }: { user: UserListItem; onDone: () => void
         <fieldset className="grid gap-2">
           <legend className="mb-1 text-sm font-semibold text-fg">Departments</legend>
           {(departments.data ?? []).map((d) => (
-            <label key={d.id} className="flex items-center gap-3 rounded-[10px] px-2 py-1.5 text-sm text-fg hover:bg-surface-2">
+            <label key={d.id} className="flex items-center gap-3 rounded-control px-2 py-1.5 text-sm text-fg hover:bg-surface-2">
               <input
                 type="checkbox"
                 className="h-4 w-4 accent-[var(--accent)]"
@@ -158,7 +158,7 @@ function EditUserForm({ user, onDone }: { user: UserListItem; onDone: () => void
           ))}
         </fieldset>
       )}
-      <label className="flex items-center justify-between gap-4 rounded-[12px] border border-line px-4 py-3">
+      <label className="flex items-center justify-between gap-4 rounded-control border border-line px-4 py-3">
         <span className="grid">
           <span className="text-sm font-semibold text-fg">Account active</span>
           <span className="text-xs text-fg-subtle">Deactivated users cannot sign in.</span>

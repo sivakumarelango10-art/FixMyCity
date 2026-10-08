@@ -12,7 +12,9 @@ import { registerSchema } from '@fixmycity/shared';
 import { PasswordInput } from '@/components/forms/password-input';
 import { Button } from '@/components/ui/button';
 import { Field, FormError, Input } from '@/components/ui/field';
+import { GoogleAuthButton } from '@/components/auth/google-button';
 import { api } from '@/lib/api';
+
 import { applyServerErrors } from '@/lib/forms';
 
 const formSchema = registerSchema
@@ -45,10 +47,20 @@ export default function RegisterPage() {
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }} className="grid gap-7">
       <div className="grid gap-2">
-        <h1 className="text-[1.75rem] font-extrabold tracking-[-0.025em] text-fg">Create your citizen account</h1>
+        <h1 className="type-page text-fg">Create your citizen account</h1>
         <p className="text-[15px] text-fg-muted">Report issues, track their progress and see your demo utility bills.</p>
       </div>
+
+      <div className="grid gap-4">
+        <GoogleAuthButton mode="signup" onError={setFormError} />
+        <div className="relative flex items-center justify-center my-1">
+          <div className="w-full border-t border-line"></div>
+          <span className="bg-bg px-3 text-xs uppercase tracking-wider text-fg-subtle">or sign up with email</span>
+        </div>
+      </div>
+
       <form onSubmit={onSubmit} noValidate className="grid gap-5">
+
         <FormError message={formError} />
         <Field id="name" label="Full name" error={formState.errors.name?.message}>
           <Input autoComplete="name" {...register('name')} />
@@ -74,7 +86,7 @@ export default function RegisterPage() {
       </form>
       <p className="text-sm text-fg-muted">
         Already registered?{' '}
-        <Link href="/login" className="font-semibold text-accent hover:underline">
+        <Link href="/login" className="link">
           Sign in
         </Link>
       </p>

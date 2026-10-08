@@ -90,7 +90,7 @@ export default function BillPage({ params }: { params: Promise<{ billId: string 
     setOpen(true);
   };
 
-  if (bill.isLoading) return <Skeleton className="h-96 rounded-[var(--radius-panel)]" />;
+  if (bill.isLoading) return <Skeleton className="h-96 rounded-panel" />;
   if (bill.isError || !bill.data) {
     return <ErrorState className="panel" message={bill.error instanceof ApiError && bill.error.status === 404 ? 'This bill was not found on your account.' : 'Could not load this bill.'} />;
   }
@@ -115,7 +115,7 @@ export default function BillPage({ params }: { params: Promise<{ billId: string 
         <Panel className="print:hidden">
           <div className="grid gap-6 p-6 sm:p-7">
             <div className="flex items-start justify-between gap-4">
-              <span className="grid h-12 w-12 place-items-center rounded-[14px] bg-accent-soft text-accent">
+              <span className="grid h-12 w-12 place-items-center rounded-panel bg-accent-soft text-accent">
                 <Icon size={24} />
               </span>
               <BillStatusBadge bill={b} />
@@ -153,7 +153,7 @@ export default function BillPage({ params }: { params: Promise<{ billId: string 
                 Pay {formatMoney(b.amount)} (demo)
               </Button>
             ) : (
-              <p className="flex items-center gap-2 rounded-[var(--radius-control)] bg-success-soft px-4 py-3 text-sm font-semibold text-success" role="status">
+              <p className="flex items-center gap-2 rounded-control bg-success-soft px-4 py-3 text-sm font-semibold text-success" role="status">
                 <CheckCircle size={18} weight="fill" /> Paid {formatDate(b.paidAt)}. Another payment for this bill is blocked.
               </p>
             )}
@@ -178,7 +178,7 @@ export default function BillPage({ params }: { params: Promise<{ billId: string 
       <Dialog open={open} onOpenChange={(o) => !pay.isPending && setOpen(o)}>
         <DialogContent title="Confirm demo payment" description="This simulates a payment. Nothing is charged.">
           <DemoNotice compact />
-          <dl className="grid gap-3 rounded-[var(--radius-control)] border border-line p-4 text-[13.5px]">
+          <dl className="grid gap-3 rounded-control border border-line p-4 text-[13.5px]">
             <div className="flex justify-between gap-4">
               <dt className="text-fg-subtle">Bill</dt>
               <dd className="text-right text-fg">

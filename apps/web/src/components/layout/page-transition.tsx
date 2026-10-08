@@ -1,7 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import { motion } from 'motion/react';
+import { useReducedMotionSafe } from '@/lib/hooks';
 
 // Becomes true after the first client render. The server-rendered page is never
 // hidden; only client-side route changes get the fade-up.
@@ -9,7 +10,7 @@ let hasHydrated = false;
 
 /** Short fade-up on each route change inside a workspace (used from template.tsx). */
 export function PageTransition({ children }: { children: React.ReactNode }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [animateIn] = React.useState(() => hasHydrated);
   React.useEffect(() => {
     hasHydrated = true;

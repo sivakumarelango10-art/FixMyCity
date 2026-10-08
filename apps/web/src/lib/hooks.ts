@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useReducedMotion } from 'motion/react';
 
 const noopSubscribe = () => () => {};
 
@@ -11,6 +12,19 @@ export function useIsClient(): boolean {
     () => true,
     () => false,
   );
+}
+
+/**
+ * Reduced-motion preference that is false during SSR and hydration.
+ * Motion's own hook reads the media query on the first client render, so using
+ * it to pick an `initial` state makes server and client HTML disagree for
+ * users who prefer reduced motion. MotionConfig (reducedMotion="user") still
+ * removes transform animations for them after hydration.
+ */
+export function useReducedMotionSafe(): boolean {
+  const reduce = useReducedMotion();
+  const client = useIsClient();
+  return client ? !!reduce : false;
 }
 
 /**

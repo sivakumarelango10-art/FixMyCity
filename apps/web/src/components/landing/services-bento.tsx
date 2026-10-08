@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { motion, useReducedMotion } from 'motion/react';
+import { motion } from 'motion/react';
 import { ArrowRight, Drop, House, Lightning, MapTrifold, Megaphone, Recycle, Warning } from '@phosphor-icons/react';
 import {
   ANNOUNCEMENT_CATEGORY_LABELS,
@@ -18,9 +18,10 @@ import { Skeleton } from '@/components/ui/primitives';
 import { api } from '@/lib/api';
 import { qk } from '@/lib/query-keys';
 import { cn, timeAgo } from '@/lib/utils';
+import { useReducedMotionSafe } from '@/lib/hooks';
 
 function Cell({ className, children, delay = 0, href, label }: { className?: string; children: React.ReactNode; delay?: number; href: string; label: string }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   return (
     <motion.article
       initial={reduce ? false : { opacity: 0, y: 16 }}

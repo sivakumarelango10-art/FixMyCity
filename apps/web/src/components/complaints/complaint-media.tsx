@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { ImageBroken } from '@phosphor-icons/react';
 import type { AttachmentDto, ComplaintCategory } from '@fixmycity/shared';
-import { CATEGORY_COLORS, CategoryIcon } from '@/components/common/complaint-meta';
+import { CategoryIcon } from '@/components/common/complaint-meta';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
@@ -27,14 +27,9 @@ export function AuthImage({ src, alt, className }: { src: string; alt: string; c
 }
 
 export function ComplaintThumb({ src, category, title, className }: { src: string | null; category: ComplaintCategory; title: string; className?: string }) {
-  if (src) return <AuthImage src={src} alt={`Photo for ${title}`} className={cn('rounded-[12px]', className)} />;
+  if (src) return <AuthImage src={src} alt={`Photo for ${title}`} className={cn('rounded-control border border-line', className)} />;
   return (
-    <div
-      className={cn('grid place-items-center rounded-[12px]', className)}
-      style={{ background: `${CATEGORY_COLORS[category]}1f`, color: CATEGORY_COLORS[category] }}
-      role="img"
-      aria-label="No photo attached"
-    >
+    <div className={cn('grid place-items-center rounded-control border border-line bg-surface-2 text-fg-subtle', className)} role="img" aria-label="No photo attached">
       <CategoryIcon category={category} size={22} />
     </div>
   );
@@ -43,7 +38,7 @@ export function ComplaintThumb({ src, category, title, className }: { src: strin
 export function PhotoGallery({ attachments, title }: { attachments: AttachmentDto[]; title: string }) {
   const [open, setOpen] = React.useState<AttachmentDto | null>(null);
   if (attachments.length === 0) {
-    return <p className="rounded-[12px] border border-dashed border-line-strong px-4 py-6 text-center text-sm text-fg-subtle">No photos attached to this record.</p>;
+    return <p className="rounded-control border border-dashed border-line-strong px-4 py-6 text-center text-sm text-fg-subtle">No photos are attached to this record.</p>;
   }
   return (
     <>
@@ -53,7 +48,7 @@ export function PhotoGallery({ attachments, title }: { attachments: AttachmentDt
             <button
               type="button"
               onClick={() => setOpen(a)}
-              className="group relative block w-full overflow-hidden rounded-[14px] border border-line focus-visible:outline-2"
+              className="group relative block w-full overflow-hidden rounded-control border border-line focus-visible:outline-2"
               aria-label={`Open ${a.kind === 'RESOLUTION' ? 'resolution' : 'evidence'} photo ${i + 1}`}
             >
               <AuthImage
@@ -69,7 +64,7 @@ export function PhotoGallery({ attachments, title }: { attachments: AttachmentDt
       <Dialog open={!!open} onOpenChange={(o) => !o && setOpen(null)}>
         {open && (
           <DialogContent title={open.kind === 'RESOLUTION' ? 'Resolution photo' : 'Evidence photo'} className="max-w-4xl">
-            <AuthImage src={open.url} alt={`Full size photo for ${title}`} className="max-h-[75dvh] w-full rounded-[12px] object-contain" />
+            <AuthImage src={open.url} alt={`Full size photo for ${title}`} className="max-h-[75dvh] w-full rounded-control bg-surface-2 object-contain" />
           </DialogContent>
         )}
       </Dialog>

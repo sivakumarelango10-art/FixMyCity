@@ -18,7 +18,7 @@ export function DemoNotice({ className, compact }: { className?: string; compact
     <div
       role="note"
       className={cn(
-        'flex items-start gap-2.5 rounded-[var(--radius-control)] border border-warning/40 bg-warning-soft px-4 py-3 text-warning',
+        'flex items-start gap-2.5 rounded-control border border-warning/40 bg-warning-soft px-4 py-3 text-warning',
         compact && 'px-3 py-2',
         className,
       )}
@@ -53,9 +53,9 @@ export function BillRow({ bill }: { bill: BillDto }) {
   return (
     <Link
       href={`/dashboard/utilities/${bill.id}`}
-      className="group grid grid-cols-[40px_1fr_auto] items-center gap-4 rounded-[14px] px-3 py-3 transition-colors hover:bg-surface-2 sm:grid-cols-[40px_1.4fr_1fr_auto_auto]"
+      className="group grid grid-cols-[40px_1fr_auto] items-center gap-4 rounded-panel px-3 py-3 transition-colors hover:bg-surface-2 sm:grid-cols-[40px_1.4fr_1fr_auto_auto]"
     >
-      <span className="grid h-10 w-10 place-items-center rounded-[12px] bg-surface-2 text-fg-muted group-hover:bg-surface-3">
+      <span className="grid h-10 w-10 place-items-center rounded-control bg-surface-2 text-fg-muted group-hover:bg-surface-3">
         <Icon size={19} />
       </span>
       <span className="grid min-w-0">

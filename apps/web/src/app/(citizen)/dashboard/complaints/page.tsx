@@ -1,10 +1,28 @@
 'use client';
 
+import { Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { PlusCircle } from '@phosphor-icons/react';
+import { COMPLAINT_STATUSES, type ComplaintStatus } from '@fixmycity/shared';
 import { PageHeader } from '@/components/common/page';
 import { ComplaintsBrowser, ReportCta } from '@/components/complaints/complaints-browser';
 import { Button } from '@/components/ui/button';
+
+function Browser() {
+  const status = useSearchParams().get('status');
+  const initial = status && (COMPLAINT_STATUSES as readonly string[]).includes(status) ? (status as ComplaintStatus) : '';
+  return (
+    <ComplaintsBrowser
+      endpoint="/api/complaints"
+      layout="cards"
+      initialFilters={{ status: initial }}
+      hrefFor={(c) => `/dashboard/complaints/${c.id}`}
+      emptyHint="Anything you report appears here with its tracking ID and live status."
+      emptyAction={<ReportCta />}
+    />
+  );
+}
 
 export default function MyComplaintsPage() {
   return (
@@ -12,7 +30,7 @@ export default function MyComplaintsPage() {
       <PageHeader
         breadcrumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'My Complaints' }]}
         title="My complaints"
-        description="Every report you have filed, with its live status. Search by tracking ID to find one quickly."
+        description="Every report you have filed and where it is now. Search by tracking ID to find one quickly."
         actions={
           <Button asChild>
             <Link href="/dashboard/complaints/new">
@@ -21,7 +39,9 @@ export default function MyComplaintsPage() {
           </Button>
         }
       />
-      <ComplaintsBrowser endpoint="/api/complaints" layout="cards" hrefFor={(c) => `/dashboard/complaints/${c.id}`} emptyAction={<ReportCta />} />
+      <Suspense>
+        <Browser />
+      </Suspense>
     </>
   );
 }

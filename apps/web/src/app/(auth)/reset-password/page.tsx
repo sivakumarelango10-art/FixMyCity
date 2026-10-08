@@ -37,7 +37,7 @@ function ResetForm() {
   return (
     <div className="grid gap-7">
       <div className="grid gap-2">
-        <h1 className="text-[1.75rem] font-extrabold tracking-[-0.025em] text-fg">Choose a new password</h1>
+        <h1 className="type-page text-fg">Choose a new password</h1>
         <p className="text-[15px] text-fg-muted">For your security, every other signed-in device will be signed out.</p>
       </div>
       <form onSubmit={onSubmit} noValidate className="grid gap-5">
@@ -52,7 +52,7 @@ function ResetForm() {
           Update password
         </Button>
       </form>
-      <Link href="/forgot-password" className="text-sm font-semibold text-accent hover:underline">
+      <Link href="/forgot-password" className="link text-sm">
         Request a new link
       </Link>
     </div>
