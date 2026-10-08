@@ -6,7 +6,7 @@ import { use } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'motion/react';
 import { toast } from 'sonner';
-import { CheckCircle, Printer, ShieldCheck } from '@phosphor-icons/react';
+import { CheckCircle, Lightning, Printer, ShieldCheck } from '@phosphor-icons/react';
 import { DEMO_PAYMENT_NOTICE, type BillDto, type DemoPaymentResult } from '@fixmycity/shared';
 import { PageHeader } from '@/components/common/page';
 import { BillStatusBadge, DemoNotice, SERVICE_ICONS } from '@/components/utilities/bill-ui';
@@ -85,6 +85,12 @@ export default function BillPage({ params }: { params: Promise<{ billId: string 
     },
   });
 
+  const handleOneClickPay = () => {
+    keyRef.current = newIdempotencyKey();
+    setError(null);
+    pay.mutate();
+  };
+
   const startCheckout = () => {
     keyRef.current = newIdempotencyKey();
     setError(null);
@@ -118,6 +124,7 @@ export default function BillPage({ params }: { params: Promise<{ billId: string 
       />
     );
   }
+
   const b = bill.data;
   const Icon = SERVICE_ICONS[b.serviceType];
 
@@ -173,9 +180,29 @@ export default function BillPage({ params }: { params: Promise<{ billId: string 
               )}
             </dl>
             {b.status === 'UNPAID' ? (
-              <Button size="lg" onClick={startCheckout} data-testid="pay-now">
-                Pay {formatMoney(b.amount)} (demo)
-              </Button>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <Button
+                  size="lg"
+                  loading={pay.isPending}
+                  loadingText="Recording demo payment…"
+                  onClick={handleOneClickPay}
+                  data-testid="one-click-demo-pay"
+                  className="flex-1 flex items-center justify-center gap-2 font-semibold shadow-xs"
+                >
+                  <Lightning size={18} weight="fill" className="text-amber-300" />
+                  <span>One-Click Demo Pay ({formatMoney(b.amount)})</span>
+                </Button>
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  disabled={pay.isPending}
+                  onClick={startCheckout}
+                  data-testid="pay-now"
+                  className="shrink-0"
+                >
+                  Review details
+                </Button>
+              </div>
             ) : (
               <p className="flex items-center gap-2 rounded-control bg-success-soft px-4 py-3 text-sm font-semibold text-success" role="status">
                 <CheckCircle size={18} weight="fill" /> Paid {formatDate(b.paidAt)}. Another payment for this bill is blocked.

@@ -1,17 +1,23 @@
 'use client';
 
+import * as React from 'react';
 import Link from 'next/link';
-import { useQuery } from '@tanstack/react-query';
-import { CreditCard, Receipt, WarningCircle } from '@phosphor-icons/react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { CreditCard, Lightning, Receipt, WarningCircle } from '@phosphor-icons/react';
+import { toast } from 'sonner';
 import { UTILITY_LABELS, UTILITY_SERVICE_TYPES, type BillDto, type PaymentDto } from '@fixmycity/shared';
 import { MetricStrip, PageHeader } from '@/components/common/page';
 import { BillRow, DemoNotice, SERVICE_ICONS } from '@/components/utilities/bill-ui';
+import { Button } from '@/components/ui/button';
 import { EmptyState, ErrorState, Panel, PanelHeader, Skeleton } from '@/components/ui/primitives';
-import { api } from '@/lib/api';
+import { api, newIdempotencyKey } from '@/lib/api';
 import { qk } from '@/lib/query-keys';
 import { formatDateTime, formatMoney } from '@/lib/utils';
 
 export default function UtilitiesPage() {
+  const qc = useQueryClient();
+  const [isPayingAll, setIsPayingAll] = React.useState(false);
+
   const bills = useQuery({ queryKey: qk.bills, queryFn: () => api.get<BillDto[]>('/api/utilities/bills') });
   const payments = useQuery({ queryKey: qk.payments, queryFn: () => api.get<PaymentDto[]>('/api/utilities/payment-history') });
 
@@ -20,6 +26,26 @@ export default function UtilitiesPage() {
   const paid = all.filter((b) => b.status === 'PAID');
   const outstanding = unpaid.reduce((s, b) => s + Number(b.amount), 0);
   const accounts = UTILITY_SERVICE_TYPES.map((t) => ({ type: t, bill: all.find((b) => b.serviceType === t) })).filter((a) => a.bill);
+
+  const handlePayAll = async () => {
+    setIsPayingAll(true);
+    try {
+      for (const bill of unpaid) {
+        await api.post(`/api/utilities/bills/${bill.id}/demo-pay`, undefined, {
+          'Idempotency-Key': newIdempotencyKey(),
+        });
+      }
+      qc.invalidateQueries({ queryKey: qk.bills });
+      qc.invalidateQueries({ queryKey: qk.payments });
+      qc.invalidateQueries({ queryKey: qk.dashboard });
+      qc.invalidateQueries({ queryKey: qk.notifications });
+      toast.success(`All ${unpaid.length} bills paid successfully in demo mode!`);
+    } catch {
+      toast.error('Could not complete all payments.');
+    } finally {
+      setIsPayingAll(false);
+    }
+  };
 
   return (
     <div className="grid gap-7">
@@ -47,7 +73,24 @@ export default function UtilitiesPage() {
       <div className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
         <div className="grid content-start gap-6">
           <Panel>
-            <PanelHeader title="Due now" description="Open a bill to review it and make a demo payment." />
+            <PanelHeader
+              title="Due now"
+              description="Pay in one click or select a bill to review itemized details."
+              action={
+                unpaid.length > 1 ? (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    loading={isPayingAll}
+                    onClick={handlePayAll}
+                    className="flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
+                  >
+                    <Lightning size={14} weight="fill" className="text-amber-500" />
+                    1-Click Pay All ({formatMoney(outstanding)})
+                  </Button>
+                ) : undefined
+              }
+            />
             <div className="p-3 sm:p-4">
               {bills.isLoading ? (
                 <div className="grid gap-2 p-2">

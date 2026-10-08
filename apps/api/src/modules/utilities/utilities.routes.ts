@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { billListQuerySchema, idempotencyKeySchema, uuidSchema } from '@fixmycity/shared';
 import { clientIp, ok, param, parse } from '../../lib/http.js';
+import { randomToken } from '../../lib/crypto.js';
 import { currentUser, requireAdmin, requireCitizen } from '../../middleware/auth.js';
 import { paymentLimiter } from '../../middleware/rate-limit.js';
 import * as service from './utilities.service.js';
@@ -21,7 +22,8 @@ utilitiesRouter.get('/bills/:billId', async (req, res) => {
 
 utilitiesRouter.post('/bills/:billId/demo-pay', paymentLimiter, async (req, res) => {
   const billId = parse(uuidSchema, param(req, 'billId'));
-  const key = parse(idempotencyKeySchema, req.get('idempotency-key') ?? '');
+  const headerKey = req.get('idempotency-key');
+  const key = parse(idempotencyKeySchema, headerKey || randomToken(24));
   const result = await service.demoPay(currentUser(req).id, billId, key, clientIp(req));
   ok(res, result, result.replayed ? 200 : 201);
 });

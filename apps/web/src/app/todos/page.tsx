@@ -14,7 +14,7 @@ export default async function Page() {
         <p className="text-muted-foreground text-sm">No todos found or &apos;todos&apos; table not yet created in Supabase.</p>
       ) : (
         <ul className="space-y-2 list-disc list-inside">
-          {todos.map((todo: any) => (
+          {todos.map((todo: { id: string | number; name?: string }) => (
             <li key={todo.id}>{todo.name}</li>
           ))}
         </ul>

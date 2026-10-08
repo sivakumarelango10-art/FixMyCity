@@ -68,7 +68,7 @@ export async function GET(request: Request) {
 
     const syncData = (await syncRes.json()) as {
       data: {
-        user: { role: Role; [key: string]: any };
+        user: { role: Role; [key: string]: unknown };
         sessionToken: string;
         cookieName?: string;
         maxAgeMs?: number;
@@ -100,7 +100,7 @@ export async function GET(request: Request) {
     }
 
     return response;
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Failed to handle OAuth callback:', err);
     return NextResponse.redirect(`${appOrigin}/login?error=oauth_sync_failed`);
   }

@@ -7,7 +7,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'motion/react';
 import { useQueryClient } from '@tanstack/react-query';
-import { homePathForRole, loginSchema, ROLE_LABELS, type LoginInput, type Role, type SessionUser } from '@fixmycity/shared';
+import { Lightning } from '@phosphor-icons/react';
+import { toast } from 'sonner';
+import { loginSchema, ROLE_LABELS, type LoginInput, type Role, type SessionUser } from '@fixmycity/shared';
 import { PasswordInput } from '@/components/forms/password-input';
 import { Button } from '@/components/ui/button';
 import { Field, FormError, Input } from '@/components/ui/field';
@@ -15,10 +17,9 @@ import { Notice } from '@/components/ui/primitives';
 import { GoogleAuthButton } from '@/components/auth/google-button';
 import { api } from '@/lib/api';
 
-import { applyServerErrors, destinationFor, safeNext } from '@/lib/forms';
+import { applyServerErrors, destinationFor } from '@/lib/forms';
 
-/** Development / demo-mode helper. Never enabled in a production build unless explicitly opted in. */
-const SHOW_DEMO = process.env.NODE_ENV !== 'production' || process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+/** Demo accounts available for instant one-click login */
 const DEMO_ACCOUNTS: { role: Role; email: string; password: string; note?: string }[] = [
   { role: 'CITIZEN', email: 'citizen@demo.fixmycity.local', password: 'Citizen@2026' },
   { role: 'ADMIN', email: 'admin@demo.fixmycity.local', password: 'Admin@2026' },
@@ -31,6 +32,7 @@ export function LoginForm() {
   const params = useSearchParams();
   const qc = useQueryClient();
   const [formError, setFormError] = React.useState<string | null>(null);
+  const [demoLoggingInEmail, setDemoLoggingInEmail] = React.useState<string | null>(null);
   const form = useForm<LoginInput>({ resolver: zodResolver(loginSchema), defaultValues: { email: '', password: '' } });
   const { register, handleSubmit, setValue, formState } = form;
 
@@ -46,6 +48,28 @@ export function LoginForm() {
             ? 'Google sign-in could not be completed. Please try again or sign in with your password.'
             : decodeURIComponent(oauthError)
           : null;
+
+  const handleOneClickLogin = async (email: string, pass: string, roleLabel?: string) => {
+    setFormError(null);
+    setDemoLoggingInEmail(email);
+    try {
+      const user = await api.post<SessionUser>('/api/auth/login', {
+        email,
+        password: pass,
+      });
+      qc.clear();
+      toast.success(`Signed in as ${roleLabel || ROLE_LABELS[user.role] || 'Demo User'}`);
+      const target = destinationFor(user.role, params.get('next'));
+      router.replace(target);
+      router.refresh();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Demo sign in failed. Please try again.';
+      setFormError(msg);
+      toast.error(msg);
+    } finally {
+      setDemoLoggingInEmail(null);
+    }
+  };
 
   const onSubmit = handleSubmit(async (values) => {
     setFormError(null);
@@ -68,8 +92,23 @@ export function LoginForm() {
 
       {notice && <Notice title={notice} />}
 
-      <div className="grid gap-4">
+      <div className="grid gap-3">
+        {/* Prominent One-Click Demo Login Button */}
+        <Button
+          type="button"
+          size="lg"
+          variant="secondary"
+          loading={demoLoggingInEmail === 'citizen@demo.fixmycity.local'}
+          loadingText="Signing in as Demo Citizen..."
+          onClick={() => handleOneClickLogin('citizen@demo.fixmycity.local', 'Citizen@2026', 'Citizen')}
+          className="w-full relative group border-brand-teal/40 bg-brand-teal/10 hover:bg-brand-teal/20 text-brand-teal font-semibold transition-all shadow-sm"
+        >
+          <Lightning weight="fill" className="h-4 w-4 mr-2 text-brand-teal shrink-0 group-hover:scale-110 transition-transform" />
+          <span>⚡ One-Click Demo Login (Citizen)</span>
+        </Button>
+
         <GoogleAuthButton mode="signin" next={params.get('next')} onError={setFormError} />
+
         <div className="relative flex items-center justify-center my-1">
           <div className="w-full border-t border-line"></div>
           <span className="bg-bg px-3 text-xs uppercase tracking-wider text-fg-subtle">or continue with email</span>
@@ -77,7 +116,6 @@ export function LoginForm() {
       </div>
 
       <form onSubmit={onSubmit} noValidate className="grid gap-5">
-
         <FormError message={formError} />
         <Field id="email" label="Email" error={formState.errors.email?.message}>
           <Input type="email" autoComplete="email" inputMode="email" {...register('email')} />
@@ -106,36 +144,51 @@ export function LoginForm() {
         </Link>
       </p>
 
-      {SHOW_DEMO && (
-        <section aria-labelledby="demo-accounts" className="grid gap-3 rounded-panel border border-dashed border-line-strong p-4">
-          <div className="grid gap-0.5">
-            <h2 id="demo-accounts" className="text-[13px] font-semibold text-fg">
-              Demo accounts
+      {/* Demo Accounts Panel with direct 1-Click login buttons */}
+      <section aria-labelledby="demo-accounts" className="grid gap-3 rounded-panel border border-dashed border-line-strong p-4 bg-surface-1/40">
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <h2 id="demo-accounts" className="text-[13px] font-semibold text-fg flex items-center gap-1.5">
+              <Lightning weight="fill" className="h-3.5 w-3.5 text-brand-teal" />
+              Demo accounts & quick login
             </h2>
-            <p className="text-xs text-fg-subtle">Development data only. Select one to fill the form, then sign in.</p>
+            <p className="text-xs text-fg-subtle">Click &ldquo;1-Click&rdquo; to sign in instantly, or click a row to fill the form.</p>
           </div>
-          <ul className="grid gap-0.5">
-            {DEMO_ACCOUNTS.map((a) => (
-              <li key={a.email} className="min-w-0">
-                <button
-                  type="button"
-                  className="grid w-full min-w-0 gap-0.5 rounded-control px-2.5 py-2 text-left transition-colors hover:bg-surface-2 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center sm:gap-3"
-                  onClick={() => {
-                    setValue('email', a.email, { shouldValidate: false });
-                    setValue('password', a.password, { shouldValidate: false });
-                  }}
-                >
-                  <span className="text-[13px] font-semibold text-fg">
-                    {ROLE_LABELS[a.role]}
-                    {a.note && <span className="font-normal text-fg-subtle"> ({a.note})</span>}
-                  </span>
-                  <span className="min-w-0 truncate font-mono text-[11.5px] text-fg-subtle sm:text-right">{a.email}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+        </div>
+        <ul className="grid gap-1.5">
+          {DEMO_ACCOUNTS.map((a) => (
+            <li key={a.email} className="flex items-center justify-between gap-2 rounded-control p-2 bg-surface hover:bg-surface-2 transition-colors border border-line/60">
+              <button
+                type="button"
+                className="flex-1 text-left min-w-0 group"
+                title="Autofill form credentials"
+                onClick={() => {
+                  setValue('email', a.email, { shouldValidate: false });
+                  setValue('password', a.password, { shouldValidate: false });
+                }}
+              >
+                <div className="text-[13px] font-semibold text-fg group-hover:text-brand-teal transition-colors">
+                  {ROLE_LABELS[a.role]}
+                  {a.note && <span className="font-normal text-fg-subtle"> ({a.note})</span>}
+                </div>
+                <div className="truncate font-mono text-[11px] text-fg-subtle">{a.email}</div>
+              </button>
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                loading={demoLoggingInEmail === a.email}
+                loadingText="Logging in..."
+                onClick={() => handleOneClickLogin(a.email, a.password, ROLE_LABELS[a.role])}
+                className="shrink-0 h-8 text-xs font-medium px-2.5 bg-brand-teal/10 hover:bg-brand-teal/20 text-brand-teal border border-brand-teal/30"
+              >
+                <Lightning weight="fill" className="h-3 w-3 mr-1 text-brand-teal" />
+                1-Click
+              </Button>
+            </li>
+          ))}
+        </ul>
+      </section>
     </motion.div>
   );
 }

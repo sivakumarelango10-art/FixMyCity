@@ -59,9 +59,9 @@ export function GoogleAuthButton({
       if (error) {
         throw error;
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setLoading(false);
-      const msg = err?.message || 'Could not initiate Google sign in. Please try again.';
+      const msg = err instanceof Error ? err.message : 'Could not initiate Google sign in. Please try again.';
       toast.error(msg);
       onError?.(msg);
     }
