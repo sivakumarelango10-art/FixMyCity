@@ -2,12 +2,10 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { motion } from 'motion/react';
 import { CaretRight } from '@phosphor-icons/react';
 import { CountUp } from '@/components/motion/reveal';
 import { Skeleton } from '@/components/ui/primitives';
 import { cn } from '@/lib/utils';
-import { useReducedMotionSafe } from '@/lib/hooks';
 
 export function Breadcrumbs({ items }: { items: { label: string; href?: string }[] }) {
   return (
@@ -94,7 +92,9 @@ function MetricBody({ m, loading }: { m: Metric; loading?: boolean }) {
       {loading ? (
         <Skeleton className="h-7 w-14" />
       ) : (
-        <p className="type-metric text-fg">{typeof m.value === 'number' ? <CountUp value={m.value} /> : (m.value ?? '-')}</p>
+        <p className={cn('text-fg', typeof m.value === 'string' && m.value.length > 7 ? 'text-xl font-bold tracking-[-0.02em] tabular' : 'type-metric')}>
+          {typeof m.value === 'number' ? <CountUp value={m.value} /> : (m.value ?? '-')}
+        </p>
       )}
       {m.hint && <p className="text-xs text-fg-subtle">{m.hint}</p>}
     </>
@@ -109,7 +109,7 @@ export function MetricStrip({ metrics, loading, className, label }: { metrics: M
   const cols = { 2: 'lg:grid-cols-2', 3: 'lg:grid-cols-3', 4: 'lg:grid-cols-4', 5: 'lg:grid-cols-5', 6: 'lg:grid-cols-6' }[metrics.length] ?? 'lg:grid-cols-4';
   return (
     <section aria-label={label} className={cn('panel overflow-hidden', className)}>
-      <ul className={cn('grid grid-cols-2 gap-px bg-line', cols)}>
+      <ul className={cn('grid grid-cols-1 gap-px bg-line min-[360px]:grid-cols-2', cols)}>
         {metrics.map((m) => {
           const content = (
             <div className="grid h-full content-start gap-2 bg-surface px-5 py-4">
@@ -117,7 +117,7 @@ export function MetricStrip({ metrics, loading, className, label }: { metrics: M
             </div>
           );
           return (
-            <li key={m.label} className="min-w-0 [&:last-child:nth-child(odd)]:col-span-2 lg:[&:last-child:nth-child(odd)]:col-span-1">
+            <li key={m.label} className="min-w-0 min-[360px]:[&:last-child:nth-child(odd)]:col-span-2 lg:[&:last-child:nth-child(odd)]:col-span-1">
               {m.href ? (
                 <Link href={m.href} className="block h-full [&>div]:transition-colors hover:[&>div]:bg-surface-2">
                   {content}
@@ -130,50 +130,6 @@ export function MetricStrip({ metrics, loading, className, label }: { metrics: M
         })}
       </ul>
     </section>
-  );
-}
-
-/** Single figure in its own card, for places where one number stands alone. */
-export function StatCard({
-  label,
-  value,
-  icon,
-  hint,
-  tone = 'neutral',
-  loading,
-  href,
-  index = 0,
-}: {
-  label: string;
-  value: number | string | null | undefined;
-  icon?: React.ReactNode;
-  hint?: React.ReactNode;
-  tone?: MetricTone;
-  loading?: boolean;
-  href?: string;
-  index?: number;
-}) {
-  const reduce = useReducedMotionSafe();
-  const body = (
-    <div className="grid gap-2">
-      <MetricBody m={{ label, value, icon, hint, tone }} loading={loading} />
-    </div>
-  );
-  return (
-    <motion.div
-      className="h-full"
-      initial={reduce ? false : { opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: index * 0.04, ease: [0.16, 1, 0.3, 1] }}
-    >
-      {href ? (
-        <Link href={href} className="panel block h-full p-5 transition-colors duration-150 hover:border-line-strong hover:bg-surface-2">
-          {body}
-        </Link>
-      ) : (
-        <div className="panel h-full p-5">{body}</div>
-      )}
-    </motion.div>
   );
 }
 

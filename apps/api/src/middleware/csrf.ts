@@ -25,8 +25,12 @@ export function setCsrfCookie(res: Response, token = randomToken(24)) {
  * which a cross-site page cannot read or forge.
  */
 export function csrfProtection(req: Request, res: Response, next: NextFunction) {
-  const cookieToken = req.cookies?.[CSRF_COOKIE] as string | undefined;
-  if (!cookieToken) setCsrfCookie(res);
+  let cookieToken = req.cookies?.[CSRF_COOKIE] as string | undefined;
+  if (!cookieToken) {
+    cookieToken = setCsrfCookie(res);
+    if (!req.cookies) req.cookies = {};
+    req.cookies[CSRF_COOKIE] = cookieToken;
+  }
 
   if (SAFE_METHODS.has(req.method)) return next();
 

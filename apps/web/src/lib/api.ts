@@ -27,9 +27,20 @@ let csrfPromise: Promise<string> | null = null;
 async function csrfToken(): Promise<string> {
   const existing = readCookie(CSRF_COOKIE);
   if (existing) return existing;
-  csrfPromise ??= fetch('/api/auth/csrf', { credentials: 'include' })
-    .then((r) => r.json() as Promise<{ data: { csrfToken: string } }>)
-    .then((j) => readCookie(CSRF_COOKIE) ?? j.data.csrfToken)
+  csrfPromise ??= fetch('/api/auth/csrf', { credentials: 'include', cache: 'no-store' })
+    .then(async (r) => {
+      const contentType = r.headers.get('content-type') || '';
+      if (!r.ok || !contentType.includes('application/json')) {
+        return readCookie(CSRF_COOKIE) ?? '';
+      }
+      try {
+        const j = (await r.json()) as { data?: { csrfToken?: string } };
+        return readCookie(CSRF_COOKIE) ?? j.data?.csrfToken ?? '';
+      } catch {
+        return readCookie(CSRF_COOKIE) ?? '';
+      }
+    })
+    .catch(() => readCookie(CSRF_COOKIE) ?? '')
     .finally(() => {
       csrfPromise = null;
     });
@@ -38,24 +49,36 @@ async function csrfToken(): Promise<string> {
 
 async function parseError(res: Response): Promise<ApiError> {
   let body: Partial<ApiErrorBody> = {};
-  try {
-    body = (await res.json()) as ApiErrorBody;
-  } catch {
-    /* non-JSON error */
+  const contentType = res.headers.get('content-type') || '';
+  let rawText = '';
+  if (contentType.includes('application/json')) {
+    try {
+      body = (await res.json()) as ApiErrorBody;
+    } catch {
+      /* non-JSON error */
+    }
+  } else {
+    try {
+      rawText = await res.text();
+    } catch {
+      /* ignore text reading failure */
+    }
   }
   let message = body.error?.message;
   if (!message) {
-    if (res.status === 502 || res.status === 504) {
-      message = 'Backend API is currently connecting or unreachable. Please verify backend status.';
-    } else if (res.status === 0 || res.status >= 500) {
-      message = 'The server is not responding. Please try again in a moment.';
+    if (rawText.includes('DNS_HOSTNAME_RESOLVED_PRIVATE') || rawText.includes('The page could not be found')) {
+      message = 'Production API backend is not configured. In Vercel Project Settings, set API_INTERNAL_URL to your deployed FixMyCity backend URL.';
+    } else if (res.status === 502 || res.status === 504) {
+      message = 'Backend API is unreachable. Please verify that the backend API server is running.';
     } else if (res.status === 404) {
-      message = 'The requested endpoint or resource was not found.';
+      message = 'Backend endpoint not found. In production, configure API_INTERNAL_URL in Vercel to your deployed backend service.';
+    } else if (res.status === 0 || res.status >= 500) {
+      message = 'The server encountered an error. Please try again in a moment.';
     } else {
       message = 'Something went wrong. Please try again.';
     }
   }
-  return new ApiError(res.status, body.error?.code ?? 'UNKNOWN', message, body.error?.fields);
+  return new ApiError(res.status, body.error?.code ?? 'BACKEND_UNREACHABLE', message, body.error?.fields);
 }
 
 type Method = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
@@ -86,7 +109,21 @@ async function request<T>(method: Method, path: string, opts: RequestOptions = {
   }
   if (!res.ok) throw await parseError(res);
   if (res.status === 204) return { data: undefined as T };
-  return (await res.json()) as { data: T; meta?: PaginationMeta };
+
+  const contentType = res.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    throw new ApiError(
+      res.status,
+      'INVALID_RESPONSE',
+      'The API server returned an unexpected response. Please verify that the API server is running on port 4000.',
+    );
+  }
+
+  try {
+    return (await res.json()) as { data: T; meta?: PaginationMeta };
+  } catch {
+    throw new ApiError(res.status, 'INVALID_JSON', 'Unable to parse server response as JSON.');
+  }
 }
 
 export const api = {

@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { UTILITY_LABELS, type AdminUtilityOverview } from '@fixmycity/shared';
-import { PageHeader, StatCard } from '@/components/common/page';
+import { MetricStrip, PageHeader } from '@/components/common/page';
 import { DemoNotice, SERVICE_ICONS } from '@/components/utilities/bill-ui';
 import { ErrorState, Panel, PanelHeader, Skeleton } from '@/components/ui/primitives';
 import { api } from '@/lib/api';
@@ -21,13 +21,17 @@ export default function AdminUtilitiesPage() {
         className="mb-0"
       />
       <DemoNotice />
-      {q.isError && <ErrorState className="panel" message={(q.error as Error).message} onRetry={() => q.refetch()} />}
-      <section className="grid grid-cols-2 gap-4 lg:grid-cols-4" aria-label="Totals">
-        <StatCard index={0} label="Bills" value={d?.totals.bills} loading={q.isLoading} />
-        <StatCard index={1} label="Unpaid" value={d?.totals.unpaid} loading={q.isLoading} tone="warning" hint={d ? `${d.totals.overdue} overdue` : undefined} />
-        <StatCard index={2} label="Demo collected" value={d ? formatMoney(d.totals.collected) : undefined} loading={q.isLoading} tone="success" />
-        <StatCard index={3} label="Outstanding" value={d ? formatMoney(d.totals.outstanding) : undefined} loading={q.isLoading} />
-      </section>
+      {q.isError && <ErrorState className="panel" title="Utility totals could not be loaded" message={(q.error as Error).message} onRetry={() => q.refetch()} />}
+      <MetricStrip
+        label="Totals"
+        loading={q.isLoading}
+        metrics={[
+          { label: 'Bills', value: d?.totals.bills },
+          { label: 'Unpaid', value: d?.totals.unpaid, tone: 'warning', hint: d ? `${d.totals.overdue} overdue` : undefined },
+          { label: 'Demo collected', value: d ? formatMoney(d.totals.collected) : undefined, tone: 'success' },
+          { label: 'Outstanding', value: d ? formatMoney(d.totals.outstanding) : undefined },
+        ]}
+      />
       <div className="grid gap-6 xl:grid-cols-[1fr_1.4fr]">
         <Panel>
           <PanelHeader title="By service" />
@@ -40,16 +44,16 @@ export default function AdminUtilitiesPage() {
                   const Icon = SERVICE_ICONS[s.serviceType];
                   return (
                     <li key={s.serviceType} className="grid grid-cols-[36px_1fr_auto] items-center gap-3">
-                      <span className="grid h-9 w-9 place-items-center rounded-control bg-surface-2 text-fg-muted">
+                      <span className="grid h-9 w-9 place-items-center rounded-control border border-line bg-surface-2 text-fg-muted" aria-hidden>
                         <Icon size={17} />
                       </span>
-                      <span className="grid">
-                        <span className="text-[13.5px] font-semibold text-fg">{UTILITY_LABELS[s.serviceType].label}</span>
+                      <span className="grid min-w-0">
+                        <span className="text-sm font-semibold text-fg">{UTILITY_LABELS[s.serviceType].label}</span>
                         <span className="text-xs text-fg-subtle">
                           {s.paid} paid, {s.unpaid} unpaid
                         </span>
                       </span>
-                      <span className="text-sm font-bold text-fg tabular">{formatMoney(s.collected)}</span>
+                      <span className="text-sm font-semibold text-fg tabular">{formatMoney(s.collected)}</span>
                     </li>
                   );
                 })}
@@ -65,7 +69,7 @@ export default function AdminUtilitiesPage() {
             ) : (
               <table className="w-full min-w-[560px] text-left text-[13.5px]">
                 <thead>
-                  <tr className="border-b border-line text-[12px] text-fg-subtle">
+                  <tr className="border-b border-line bg-surface-2/70 text-xs text-fg-subtle">
                     <th scope="col" className="py-3 pl-5 pr-3 font-semibold">Reference</th>
                     <th scope="col" className="px-3 py-3 font-semibold">Citizen</th>
                     <th scope="col" className="px-3 py-3 font-semibold">Service</th>

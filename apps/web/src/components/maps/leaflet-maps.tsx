@@ -80,11 +80,13 @@ function FitToMarkers({ points }: { points: { latitude: number; longitude: numbe
   React.useEffect(() => {
     if (points.length === 0) return;
     if (points.length === 1) {
-      map.setView([points[0]!.latitude, points[0]!.longitude], 15);
+      map.setView([points[0]!.latitude, points[0]!.longitude], 15, { animate: false });
       return;
     }
     const bounds = L.latLngBounds(points.map((p) => [p.latitude, p.longitude] as [number, number]));
-    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+    // Instant, not animated: an animated fit that is still running when the page
+    // navigates away makes Leaflet read positions from removed panes (_leaflet_pos).
+    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15, animate: false });
     // Refit only when the set of points changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signature, map]);

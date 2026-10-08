@@ -102,7 +102,7 @@ export function Hero() {
 
           {/* Main Display Headline */}
           <h1 style={delay(60)} className="enter-up type-display text-white">
-            <span className="block">Your City.</span>
+            <span className="block">Your City.</span>{' '}
             <span className="block text-[#54B4B0]">Your Voice.</span>
           </h1>
 

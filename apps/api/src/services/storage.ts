@@ -176,6 +176,9 @@ class S3Storage implements StorageAdapter {
 }
 
 function createStorage(): StorageAdapter {
+  if (env.isTest) {
+    return new LocalDiskStorage(env.UPLOAD_DIR);
+  }
   if (env.STORAGE_DRIVER === 'supabase') {
     if (!env.SUPABASE_URL || !env.SUPABASE_SECRET_KEY) {
       throw new Error('STORAGE_DRIVER=supabase requires SUPABASE_URL and SUPABASE_SECRET_KEY');

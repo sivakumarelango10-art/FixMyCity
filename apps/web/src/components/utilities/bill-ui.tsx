@@ -135,17 +135,17 @@ export function BillRow({
   return (
     <div className="group relative flex items-center justify-between gap-3 rounded-control px-3 py-3 transition-colors hover:bg-surface-2 sm:grid sm:grid-cols-[40px_minmax(0,1.4fr)_minmax(0,1fr)_auto_auto] sm:gap-4">
       <Link href={`/dashboard/utilities/${bill.id}`} className="absolute inset-0 z-0" aria-label={`View ${bill.serviceLabel} bill`} />
-      <span className="relative z-10 grid h-10 w-10 shrink-0 place-items-center rounded-control border border-line bg-surface-2 text-fg-muted" aria-hidden>
+      <span className="pointer-events-none relative z-10 grid h-10 w-10 shrink-0 place-items-center rounded-control border border-line bg-surface-2 text-fg-muted" aria-hidden>
         <Icon size={19} />
       </span>
-      <span className="relative z-10 grid min-w-0">
+      <span className="pointer-events-none relative z-10 grid min-w-0">
         <span className="truncate text-sm font-semibold text-fg">{bill.serviceLabel}</span>
         <span className="truncate text-xs text-fg-subtle">{bill.billingPeriod}</span>
       </span>
-      <span className="relative z-10 hidden text-[13px] text-fg-muted sm:block">
+      <span className="pointer-events-none relative z-10 hidden text-[13px] text-fg-muted sm:block">
         {bill.status === 'PAID' ? `Paid ${formatDate(bill.paidAt)}` : `Due ${formatDate(bill.dueDate)}`}
       </span>
-      <span className="relative z-10 grid justify-items-end gap-1">
+      <span className="pointer-events-none relative z-10 grid justify-items-end gap-1">
         <span className="text-[15px] font-semibold text-fg tabular">{formatMoney(bill.amount)}</span>
         <BillStatusBadge bill={bill} />
       </span>

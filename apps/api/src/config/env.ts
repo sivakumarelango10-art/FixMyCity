@@ -17,7 +17,18 @@ const envSchema = z.object({
   API_PORT: z.coerce.number().int().default(4000),
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
   WEB_ORIGIN: z.string().default('http://localhost:3000'),
-  SESSION_SECRET: z.string().min(32, 'SESSION_SECRET must be at least 32 characters'),
+  SESSION_SECRET: z
+    .string()
+    .min(1, 'SESSION_SECRET is required')
+    .transform((val) => {
+      if (val.length < 32) {
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error('SESSION_SECRET must be at least 32 characters in production');
+        }
+        return val.padEnd(32, '0');
+      }
+      return val;
+    }),
   SESSION_TTL_HOURS: z.coerce.number().int().min(1).max(24 * 90).default(168),
   COOKIE_SECURE: bool,
   TRUST_PROXY: bool,
@@ -69,10 +80,13 @@ const resolvedSupabaseKey = raw.SUPABASE_SECRET_KEY || raw.SUPABASE_SERVICE_ROLE
 const resolvedSupabasePublishableKey = raw.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || raw.SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_d3uy3MX06pfCeivCwyZq5A_nGVTqqtO';
 
 const resolvedGeminiKey = raw.GEMINI_API_KEY || raw.GOOGLE_API_KEY;
+
 const resolvedStorageDriver =
-  raw.STORAGE_DRIVER === 'supabase' || (raw.STORAGE_DRIVER !== 's3' && Boolean(resolvedSupabaseUrl && resolvedSupabaseKey))
-    ? ('supabase' as const)
-    : raw.STORAGE_DRIVER;
+  raw.STORAGE_DRIVER === 'local'
+    ? ('local' as const)
+    : raw.STORAGE_DRIVER === 'supabase' || (raw.STORAGE_DRIVER !== 's3' && Boolean(resolvedSupabaseUrl && resolvedSupabaseKey))
+      ? ('supabase' as const)
+      : raw.STORAGE_DRIVER;
 
 const resolvedAiProvider =
   raw.AI_PROVIDER === 'auto'
