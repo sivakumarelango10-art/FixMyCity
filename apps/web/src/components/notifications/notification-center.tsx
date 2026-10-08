@@ -10,7 +10,7 @@ import { PageHeader } from '@/components/common/page';
 import { Button } from '@/components/ui/button';
 import { EmptyState, ErrorState, Pagination, Panel, Skeleton, Tabs, TabsList, TabsTrigger } from '@/components/ui/primitives';
 import { api, toQuery } from '@/lib/api';
-import { usePageReset } from '@/lib/hooks';
+import { useIsClient, usePageReset } from '@/lib/hooks';
 import { qk } from '@/lib/query-keys';
 import { NotificationRow, useMarkAllRead, useMarkRead, useUnreadCount } from './notification-bell';
 
@@ -47,6 +47,10 @@ export function NotificationCenter() {
     placeholderData: keepPreviousData,
   });
   const unread = useUnreadCount();
+  // The header bell shares this query and may fill the cache before this page hydrates.
+  // Read it only after hydration so server and client markup always agree.
+  const hydrated = useIsClient();
+  const unreadCount = hydrated ? (unread.data?.count ?? 0) : 0;
   const markRead = useMarkRead();
   const markAll = useMarkAllRead();
 
@@ -61,7 +65,7 @@ export function NotificationCenter() {
         title="Notifications"
         description="Status changes, assignments, payments and city notices. New ones arrive live while you are signed in."
         actions={
-          <Button variant="secondary" disabled={!unread.data?.count || markAll.isPending} onClick={() => markAll.mutate()}>
+          <Button variant="secondary" disabled={!unreadCount || markAll.isPending} onClick={() => markAll.mutate()}>
             <Checks size={16} /> Mark all as read
           </Button>
         }
@@ -70,7 +74,7 @@ export function NotificationCenter() {
         <Tabs value={filter} onValueChange={(v) => setFilter(v as 'all' | 'unread')}>
           <TabsList aria-label="Filter notifications">
             <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="unread">Unread{unread.data?.count ? ` (${unread.data.count})` : ''}</TabsTrigger>
+            <TabsTrigger value="unread">Unread{unreadCount ? ` (${unreadCount})` : ''}</TabsTrigger>
           </TabsList>
         </Tabs>
         <Panel>

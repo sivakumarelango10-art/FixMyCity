@@ -32,7 +32,8 @@ export default function MyComplaintsPage() {
         title="My complaints"
         description="Every report you have filed and where it is now. Search by tracking ID to find one quickly."
         actions={
-          <Button asChild>
+          // The top bar carries a labeled Report button from the sm breakpoint up.
+          <Button asChild className="sm:hidden">
             <Link href="/dashboard/complaints/new">
               <PlusCircle size={18} weight="bold" /> Report an Issue
             </Link>

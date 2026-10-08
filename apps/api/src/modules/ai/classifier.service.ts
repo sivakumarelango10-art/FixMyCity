@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenAI, Type } from '@google/genai';
 import { z } from 'zod';
 import {
   CATEGORY_META,
@@ -15,12 +16,11 @@ import { logger } from '../../lib/logger.js';
 /**
  * Complaint classification.
  *
- * With ANTHROPIC_API_KEY configured, Claude suggests a category and priority
- * through a JSON-schema constrained response. The department is always
+ * Supports Google Gemini (gemini-2.5-flash / Gemini 3.8) and Anthropic Claude
+ * through JSON-schema constrained responses. The department is always
  * derived from the category through the fixed routing table, so the model can
- * never invent a department. Any failure (timeout, refusal, malformed output,
- * network) falls back to the deterministic rule-based classifier, and the
- * result is labeled with the source that actually produced it.
+ * never invent an invalid department. Any failure (timeout, refusal, malformed output,
+ * network) falls back to the deterministic rule-based classifier.
  */
 
 const llmOutputSchema = z.object({
@@ -63,10 +63,18 @@ Rules:
 - The explanation is one or two plain sentences for a municipal administrator. Do not state probabilities or confidence scores.
 - signals lists up to 5 short phrases from the complaint that drove the decision.`;
 
-let client: Anthropic | null = null;
-function getClient(): Anthropic {
-  client ??= new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, maxRetries: 0, timeout: env.AI_TIMEOUT_MS });
-  return client;
+let anthropicClient: Anthropic | null = null;
+function getAnthropicClient(): Anthropic {
+  anthropicClient ??= new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, maxRetries: 0, timeout: env.AI_TIMEOUT_MS });
+  return anthropicClient;
+}
+
+let geminiClient: GoogleGenAI | null = null;
+function getGeminiClient(): GoogleGenAI {
+  const apiKey = env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
+  geminiClient ??= new GoogleGenAI({ apiKey });
+  return geminiClient;
 }
 
 export interface ClassifyInput {
@@ -75,7 +83,8 @@ export interface ClassifyInput {
   category?: ComplaintCategory;
 }
 
-async function classifyWithLlm(input: ClassifyInput): Promise<ClassificationResult> {
+async function classifyWithGemini(input: ClassifyInput): Promise<ClassificationResult> {
+  const client = getGeminiClient();
   const complaintText = [
     input.title ? `Title: ${input.title}` : null,
     `Description: ${input.description}`,
@@ -84,9 +93,82 @@ async function classifyWithLlm(input: ClassifyInput): Promise<ClassificationResu
     .filter(Boolean)
     .join('\n');
 
-  const response = await getClient().beta.messages.create(
+  // Use configured model (e.g. gemini-2.5-flash, gemini-3.8-flash, etc.)
+  const modelName = env.AI_MODEL.startsWith('claude') ? 'gemini-2.5-flash' : env.AI_MODEL;
+
+  const response = await client.models.generateContent({
+    model: modelName,
+    contents: `<complaint>\n${complaintText}\n</complaint>`,
+    config: {
+      systemInstruction: SYSTEM_PROMPT,
+      responseMimeType: 'application/json',
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          category: {
+            type: Type.STRING,
+            enum: [...COMPLAINT_CATEGORIES],
+          },
+          priority: {
+            type: Type.STRING,
+            enum: [...PRIORITIES],
+          },
+          explanation: {
+            type: Type.STRING,
+          },
+          signals: {
+            type: Type.ARRAY,
+            items: { type: Type.STRING },
+          },
+        },
+        required: ['category', 'priority', 'explanation', 'signals'],
+      },
+    },
+  });
+
+  const rawText = response.text?.trim() ?? '';
+  if (!rawText) throw new Error('The Gemini model returned an empty response.');
+
+  // Clean code blocks if present
+  const cleanedText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+
+  let json: unknown;
+  try {
+    json = JSON.parse(cleanedText);
+  } catch {
+    throw new Error('The Gemini response was not valid JSON.');
+  }
+
+  const parsed = llmOutputSchema.safeParse(json);
+  if (!parsed.success) throw new Error('The Gemini response did not match the expected schema.');
+
+  const departmentCode = CATEGORY_META[parsed.data.category].departmentCode;
+  return {
+    suggestedCategory: parsed.data.category,
+    suggestedDepartmentCode: departmentCode,
+    suggestedDepartmentName: DEPARTMENT_DEFAULTS[departmentCode].name,
+    suggestedPriority: parsed.data.priority,
+    explanation: parsed.data.explanation.trim(),
+    source: 'LLM',
+    model: response.modelVersion ?? modelName,
+    signals: parsed.data.signals.slice(0, 5),
+  };
+}
+
+async function classifyWithAnthropic(input: ClassifyInput): Promise<ClassificationResult> {
+  const complaintText = [
+    input.title ? `Title: ${input.title}` : null,
+    `Description: ${input.description}`,
+    input.category ? `Category chosen by the resident (may be wrong): ${input.category}` : null,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const modelName = env.AI_MODEL.startsWith('gemini') ? 'claude-3-5-sonnet-20241022' : env.AI_MODEL;
+
+  const response = await getAnthropicClient().beta.messages.create(
     {
-      model: env.AI_MODEL,
+      model: modelName,
       max_tokens: 2048,
       betas: ['server-side-fallback-2026-07-01'],
       fallbacks: 'default',
@@ -124,9 +206,26 @@ async function classifyWithLlm(input: ClassifyInput): Promise<ClassificationResu
     suggestedPriority: parsed.data.priority,
     explanation: parsed.data.explanation.trim(),
     source: 'LLM',
-    model: response.model ?? env.AI_MODEL,
+    model: response.model ?? modelName,
     signals: parsed.data.signals.slice(0, 5),
   };
+}
+
+async function classifyWithLlm(input: ClassifyInput): Promise<ClassificationResult> {
+  if (env.AI_PROVIDER === 'gemini' && env.GEMINI_API_KEY) {
+    return classifyWithGemini(input);
+  }
+  if (env.AI_PROVIDER === 'anthropic' && env.ANTHROPIC_API_KEY) {
+    return classifyWithAnthropic(input);
+  }
+  // Auto mode preference: Gemini first, then Anthropic
+  if (env.GEMINI_API_KEY) {
+    return classifyWithGemini(input);
+  }
+  if (env.ANTHROPIC_API_KEY) {
+    return classifyWithAnthropic(input);
+  }
+  throw new Error('No AI provider configured');
 }
 
 function describeFailure(err: unknown): string {
@@ -134,7 +233,15 @@ function describeFailure(err: unknown): string {
   if (err instanceof Anthropic.RateLimitError) return 'AI provider rate limit reached';
   if (err instanceof Anthropic.AuthenticationError) return 'AI provider credentials were rejected';
   if (err instanceof Anthropic.APIError) return `AI provider error ${err.status ?? ''}`.trim();
-  if (err instanceof Error) return err.message;
+  if (err instanceof Error) {
+    const msg = err.message.toLowerCase();
+    if (msg.includes('timed out') || msg.includes('timeout')) return 'AI provider timed out';
+    if (msg.includes('rate limit') || msg.includes('quota') || msg.includes('429')) return 'AI provider rate limit reached';
+    if (msg.includes('api key') || msg.includes('auth') || msg.includes('unauthorized') || msg.includes('401') || msg.includes('403')) {
+      return 'AI provider credentials were rejected';
+    }
+    return err.message;
+  }
   return 'AI provider unavailable';
 }
 
@@ -154,7 +261,7 @@ export async function classifyComplaint(input: ClassifyInput): Promise<Classific
 
 export function aiProviderStatus() {
   return {
-    provider: env.aiEnabled ? ('anthropic' as const) : ('none' as const),
+    provider: env.aiEnabled ? env.AI_PROVIDER : ('none' as const),
     model: env.aiEnabled ? env.AI_MODEL : null,
     configured: env.aiEnabled,
   };

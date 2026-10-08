@@ -58,6 +58,7 @@ export function Hero() {
               </div>
             </div>
           </div>
+          <MapLegend items={complaints} className="rounded-panel border border-line bg-surface p-3.5 sm:hidden [&>p]:hidden" />
           <figcaption className="px-1 text-caption text-fg-subtle">
             Live from the demo database. The public map never shows who reported an issue.
           </figcaption>

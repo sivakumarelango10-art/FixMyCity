@@ -43,11 +43,18 @@ async function parseError(res: Response): Promise<ApiError> {
   } catch {
     /* non-JSON error */
   }
-  const message =
-    body.error?.message ??
-    (res.status === 0 || res.status >= 500
-      ? 'The server is not responding. Please try again in a moment.'
-      : 'Something went wrong. Please try again.');
+  let message = body.error?.message;
+  if (!message) {
+    if (res.status === 502 || res.status === 504) {
+      message = 'Backend API is currently connecting or unreachable. Please verify backend status.';
+    } else if (res.status === 0 || res.status >= 500) {
+      message = 'The server is not responding. Please try again in a moment.';
+    } else if (res.status === 404) {
+      message = 'The requested endpoint or resource was not found.';
+    } else {
+      message = 'Something went wrong. Please try again.';
+    }
+  }
   return new ApiError(res.status, body.error?.code ?? 'UNKNOWN', message, body.error?.fields);
 }
 

@@ -1,8 +1,8 @@
 'use client';
 
+import type * as React from 'react';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { motion } from 'motion/react';
 import { ArrowRight, Drop, House, Lightning, MapTrifold, Megaphone, Recycle, Warning } from '@phosphor-icons/react';
 import {
   ANNOUNCEMENT_CATEGORY_LABELS,
@@ -13,22 +13,18 @@ import {
   type AnnouncementDto,
 } from '@fixmycity/shared';
 import { CATEGORY_ICONS } from '@/components/common/complaint-meta';
+import { MiniRoute } from '@/components/complaints/timeline';
 import { Reveal } from '@/components/motion/reveal';
 import { Skeleton } from '@/components/ui/primitives';
 import { api } from '@/lib/api';
 import { qk } from '@/lib/query-keys';
 import { cn, timeAgo } from '@/lib/utils';
-import { useReducedMotionSafe } from '@/lib/hooks';
 
 function Cell({ className, children, delay = 0, href, label }: { className?: string; children: React.ReactNode; delay?: number; href: string; label: string }) {
-  const reduce = useReducedMotionSafe();
   return (
-    <motion.article
-      initial={reduce ? false : { opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.25 }}
-      transition={{ duration: 0.55, delay, ease: [0.16, 1, 0.3, 1] }}
-      className={cn('group relative flex flex-col overflow-hidden rounded-panel border border-line p-6 transition-colors duration-200 hover:border-line-strong sm:p-7', className)}
+    <article
+      style={{ '--reveal-offset': `${Math.round(delay * 100)}%` } as React.CSSProperties}
+      className={cn('reveal group relative flex flex-col overflow-hidden rounded-panel border border-line p-6 transition-colors duration-200 hover:border-line-strong sm:p-7', className)}
     >
       {children}
       <Link href={href} className="mt-auto inline-flex w-fit items-center gap-1.5 pt-6 text-sm font-semibold text-accent-text">
@@ -36,7 +32,7 @@ function Cell({ className, children, delay = 0, href, label }: { className?: str
         {label}
         <ArrowRight size={15} weight="bold" className="transition-transform duration-200 group-hover:translate-x-0.5" />
       </Link>
-    </motion.article>
+    </article>
   );
 }
 
@@ -107,18 +103,25 @@ export function ServicesBento() {
                 );
               })}
             </ul>
+            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 rounded-control border border-dashed border-line-strong px-4 py-3">
+              <span className="grid gap-0.5">
+                <span className="text-xs text-fg-subtle">Every report gets a tracking ID</span>
+                <span className="font-mono text-sm font-medium text-fg">FMC-2026-000001</span>
+              </span>
+              <MiniRoute status="ASSIGNED" />
+            </div>
           </Cell>
 
           {/* Issue map: street-grid pattern, the same blue as open reports on the map. */}
-          <Cell
-            delay={0.06}
-            className="bg-accent-soft [background-image:linear-gradient(var(--primary-border)_1px,transparent_1px),linear-gradient(90deg,var(--primary-border)_1px,transparent_1px)] [background-size:44px_44px] [background-position:-1px_-1px] md:col-span-5"
-            href="/services#issue-map"
-            label="How the map works"
-          >
-            <MapTrifold size={26} className="text-accent-text" aria-hidden />
-            <h3 className="mt-4 text-lg font-semibold tracking-[-0.015em] text-fg">Issue map</h3>
-            <p className="mt-2 max-w-sm text-sm leading-relaxed text-fg-muted">See what is already reported nearby before you file, and watch pins change as work moves.</p>
+          <Cell delay={0.06} className="bg-accent-soft md:col-span-5" href="/services#issue-map" label="How the map works">
+            {/* Street grid, fading out where the text sits. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 [background-image:linear-gradient(color-mix(in_oklab,var(--primary)_16%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_oklab,var(--primary)_16%,transparent)_1px,transparent_1px)] [background-size:44px_44px] [mask-image:linear-gradient(to_left,black_15%,transparent_75%)]"
+            />
+            <MapTrifold size={26} className="relative text-accent-text" aria-hidden />
+            <h3 className="relative mt-4 text-lg font-semibold tracking-[-0.015em] text-fg">Issue map</h3>
+            <p className="relative mt-2 max-w-[30ch] text-sm leading-relaxed text-fg-muted">See what is already reported nearby before you file, and watch pins change as work moves.</p>
           </Cell>
 
           {/* Utility hub */}

@@ -149,7 +149,7 @@ function EditUserForm({ user, onDone }: { user: UserListItem; onDone: () => void
             <label key={d.id} className="flex items-center gap-3 rounded-control px-2 py-1.5 text-sm text-fg hover:bg-surface-2">
               <input
                 type="checkbox"
-                className="h-4 w-4 accent-[var(--accent)]"
+                className="h-4 w-4 accent-[var(--primary)]"
                 checked={deptIds.includes(d.id)}
                 onChange={(e) => setDeptIds((ids) => (e.target.checked ? [...ids, d.id] : ids.filter((x) => x !== d.id)))}
               />

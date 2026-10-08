@@ -387,8 +387,8 @@ export interface AuditLogDto {
 }
 
 export interface SystemStatus {
-  ai: { provider: 'anthropic' | 'none'; model: string | null; configured: boolean };
-  storage: { driver: 'local' | 's3'; durable: boolean };
+  ai: { provider: 'gemini' | 'anthropic' | 'none'; model: string | null; configured: boolean };
+  storage: { driver: 'local' | 's3' | 'supabase'; durable: boolean };
   email: { configured: boolean };
   realtime: { connectedClients: number };
   environment: string;

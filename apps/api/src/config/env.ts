@@ -23,7 +23,7 @@ const envSchema = z.object({
   TRUST_PROXY: bool,
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
 
-  STORAGE_DRIVER: z.enum(['local', 's3']).default('local'),
+  STORAGE_DRIVER: z.enum(['local', 's3', 'supabase']).default('local'),
   UPLOAD_DIR: z.string().default('uploads'),
   S3_BUCKET: z.string().optional(),
   S3_REGION: z.string().optional(),
@@ -31,8 +31,19 @@ const envSchema = z.object({
   S3_ACCESS_KEY_ID: z.string().optional(),
   S3_SECRET_ACCESS_KEY: z.string().optional(),
 
+  // Supabase Storage & Services
+  SUPABASE_URL: z.string().optional(),
+  SUPABASE_SECRET_KEY: z.string().optional(),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+  SUPABASE_KEY: z.string().optional(),
+  SUPABASE_STORAGE_BUCKET: z.string().default('complaint-photos'),
+
+  // AI Classification (Gemini & Anthropic)
+  GEMINI_API_KEY: z.string().optional(),
+  GOOGLE_API_KEY: z.string().optional(),
   ANTHROPIC_API_KEY: z.string().optional(),
-  AI_MODEL: z.string().default('claude-opus-5-5'),
+  AI_PROVIDER: z.enum(['gemini', 'anthropic', 'auto']).default('auto'),
+  AI_MODEL: z.string().default('gemini-2.5-flash'),
   AI_TIMEOUT_MS: z.coerce.number().int().min(1000).max(60_000).default(10000),
 
   SMTP_HOST: z.string().optional(),
@@ -50,15 +61,35 @@ if (!parsed.success) {
 
 const raw = parsed.data;
 
+const resolvedSupabaseKey = raw.SUPABASE_SECRET_KEY || raw.SUPABASE_SERVICE_ROLE_KEY || raw.SUPABASE_KEY;
+const resolvedGeminiKey = raw.GEMINI_API_KEY || raw.GOOGLE_API_KEY;
+const resolvedStorageDriver =
+  raw.STORAGE_DRIVER === 'supabase' || (raw.STORAGE_DRIVER !== 's3' && Boolean(raw.SUPABASE_URL && resolvedSupabaseKey))
+    ? ('supabase' as const)
+    : raw.STORAGE_DRIVER;
+
+const resolvedAiProvider =
+  raw.AI_PROVIDER === 'auto'
+    ? resolvedGeminiKey
+      ? ('gemini' as const)
+      : raw.ANTHROPIC_API_KEY
+        ? ('anthropic' as const)
+        : ('none' as const)
+    : raw.AI_PROVIDER;
+
 export const env = {
   ...raw,
+  STORAGE_DRIVER: resolvedStorageDriver,
+  SUPABASE_SECRET_KEY: resolvedSupabaseKey,
+  GEMINI_API_KEY: resolvedGeminiKey,
+  AI_PROVIDER: resolvedAiProvider,
   isProduction: raw.NODE_ENV === 'production',
   isTest: raw.NODE_ENV === 'test',
   webOrigins: raw.WEB_ORIGIN.split(',')
     .map((o) => o.trim())
     .filter(Boolean),
   sessionTtlMs: raw.SESSION_TTL_HOURS * 60 * 60 * 1000,
-  aiEnabled: Boolean(raw.ANTHROPIC_API_KEY && raw.ANTHROPIC_API_KEY.trim()),
+  aiEnabled: Boolean(resolvedGeminiKey || (raw.ANTHROPIC_API_KEY && raw.ANTHROPIC_API_KEY.trim())),
   smtpEnabled: Boolean(raw.SMTP_HOST),
 };
 

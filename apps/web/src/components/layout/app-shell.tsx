@@ -85,16 +85,16 @@ function ThemeChoice() {
   );
 }
 
-function UserMenu() {
+function UserMenu({ nameFrom = 'md' }: { nameFrom?: 'md' | '2xl' }) {
   const user = useSessionUser();
   const signOut = useSignOut();
   const profileHref = user.role === 'CITIZEN' ? '/dashboard/profile' : user.role === 'DEPARTMENT_OFFICER' ? '/department/settings' : '/admin/settings';
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex h-11 items-center gap-2.5 rounded-control pl-1 pr-1.5 text-left transition-colors hover:bg-surface-2 md:pr-2.5" aria-label="Account menu">
+        <button className="flex h-11 items-center gap-2.5 rounded-control pl-1 pr-1.5 text-left transition-colors hover:bg-surface-2" aria-label="Account menu">
           <span className="grid h-8 w-8 place-items-center rounded-full bg-[#13234a] text-xs font-bold text-[#e9eef7]">{initials(user.name)}</span>
-          <span className="hidden min-w-0 md:block">
+          <span className={cn('hidden min-w-0', nameFrom === 'md' ? 'md:block' : '2xl:block')}>
             <span className="block max-w-[140px] truncate text-[13px] font-semibold leading-tight text-fg">{user.name}</span>
             <span className="block text-xs leading-tight text-fg-subtle">{ROLE_LABELS[user.role]}</span>
           </span>
@@ -229,9 +229,9 @@ function CitizenShell({ children }: { children: React.ReactNode }) {
                   key={item.href}
                   href={item.href}
                   aria-current={active ? 'page' : undefined}
-                  className={cn('relative flex items-center px-2.5 text-sm font-medium transition-colors', active ? 'text-fg' : 'text-fg-muted hover:text-fg')}
+                  className={cn('relative flex items-center whitespace-nowrap px-2.5 text-sm font-medium transition-colors', active ? 'text-fg' : 'text-fg-muted hover:text-fg')}
                 >
-                  {item.label}
+                  {item.short ?? item.label}
                   {active && <motion.span layoutId="citizen-nav" className="absolute inset-x-2.5 -bottom-px h-0.5 rounded-full bg-accent" transition={{ type: 'spring', stiffness: 480, damping: 40 }} />}
                 </Link>
               );
@@ -242,11 +242,11 @@ function CitizenShell({ children }: { children: React.ReactNode }) {
             <Button asChild size="sm" className="h-10 px-3 sm:px-3.5">
               <Link href="/dashboard/complaints/new">
                 <Plus size={16} weight="bold" />
-                <span className="sr-only sm:not-sr-only">Report an Issue</span>
+                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Report an Issue</span>
               </Link>
             </Button>
             <NotificationBell />
-            <UserMenu />
+            <UserMenu nameFrom="2xl" />
           </div>
         </div>
       </header>

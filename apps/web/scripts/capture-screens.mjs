@@ -41,7 +41,7 @@ async function complaintId(context, title) {
 }
 
 const VIEWS = [
-  { name: 'citizen-dashboard', account: 'citizen', path: async () => '/dashboard', ready: 'text=Recent complaints' },
+  { name: 'citizen-dashboard', account: 'citizen', path: async () => '/dashboard', ready: 'text=Needs your attention' },
   {
     name: 'complaint-tracking',
     account: 'citizen',

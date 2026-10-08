@@ -35,7 +35,7 @@ test.describe.serial('complaint workflow', () => {
     await expect(page.getByRole('img', { name: 'Selected photo pothole.jpg' })).toBeVisible();
 
     // The rule-based suggestion appears before submitting.
-    await expect(page.getByText('Road Maintenance Department')).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText('Road Maintenance Department', { exact: true })).toBeVisible({ timeout: 20_000 });
     await expect(page.getByText('Source: Local rule-based classifier')).toBeVisible();
 
     const map = page.getByRole('application', { name: /Pick the issue location/ });
@@ -48,7 +48,7 @@ test.describe.serial('complaint workflow', () => {
     await expect(page.getByRole('heading', { name: 'Complaint submitted' })).toBeVisible({ timeout: 30_000 });
     trackingId = (await page.getByTestId('tracking-id').innerText()).trim();
     expect(trackingId).toMatch(/^FMC-\d{4}-\d{6}$/);
-    await expect(page.getByText('Road Maintenance Department')).toBeVisible();
+    await expect(page.getByText('Road Maintenance Department', { exact: true })).toBeVisible();
 
     await page.getByRole('link', { name: 'Track this complaint' }).click();
     await expect(page).toHaveURL(/\/dashboard\/complaints\/[0-9a-f-]{36}$/);

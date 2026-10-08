@@ -23,6 +23,8 @@ export default function AdminOverviewPage() {
   });
   const a = q.data;
   const t = a?.totals;
+  // Closed reports never need a department, even when they were closed before assignment.
+  const waiting = (queue.data?.data ?? []).filter((c) => c.status !== 'REJECTED' && c.status !== 'RESOLVED');
   const avg = a ? formatHours(a.averageResolutionHours) : null;
 
   return (
@@ -76,8 +78,8 @@ export default function AdminOverviewPage() {
           <div className="mt-4 border-t border-line">
             {queue.isLoading ? (
               <ComplaintListSkeleton rows={3} />
-            ) : queue.data && queue.data.data.length > 0 ? (
-              <ComplaintCards items={queue.data.data} hrefFor={(c) => `/admin/complaints/${c.id}`} />
+            ) : waiting.length > 0 ? (
+              <ComplaintCards items={waiting} hrefFor={(c) => `/admin/complaints/${c.id}`} />
             ) : (
               <EmptyState icon={<CheckCircle size={22} />} title="The queue is clear" description="Every complaint has a department. New reports appear here as they arrive." />
             )}

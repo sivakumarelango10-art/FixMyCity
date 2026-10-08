@@ -1,8 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   ArrowCounterClockwise,
@@ -29,6 +27,7 @@ import { Button } from '@/components/ui/button';
 import { EmptyState, ErrorState, Notice, Panel, PanelHeader, Skeleton } from '@/components/ui/primitives';
 import { useSessionUser } from '@/providers/session-provider';
 import { api } from '@/lib/api';
+import { useIsClient } from '@/lib/hooks';
 import { qk } from '@/lib/query-keys';
 import { cn, formatDate, formatMoney, pluralize, timeAgo } from '@/lib/utils';
 
@@ -162,9 +161,10 @@ const SHORTCUTS = [
   { href: '/dashboard/help', label: 'Services and help', icon: Lifebuoy },
 ];
 
+/** Shown once after registration (?welcome=1). Read after hydration so it never affects server markup. */
 function Welcome() {
-  const params = useSearchParams();
-  if (!params.get('welcome')) return null;
+  const hydrated = useIsClient();
+  if (!hydrated || !new URLSearchParams(window.location.search).has('welcome')) return null;
   return <Notice tone="success" title="Your account is ready">Report your first issue, or look around: your bills and city updates are already here.</Notice>;
 }
 
@@ -188,7 +188,8 @@ export default function CitizenDashboardPage() {
             : 'Your reports, bills and city updates in one place.'
         }
         actions={
-          <Button asChild>
+          // The top bar carries a labeled Report button from the sm breakpoint up.
+          <Button asChild className="sm:hidden">
             <Link href="/dashboard/complaints/new">
               <PlusCircle size={18} weight="bold" /> Report an Issue
             </Link>
@@ -197,9 +198,7 @@ export default function CitizenDashboardPage() {
         className="mb-2"
       />
 
-      <Suspense>
-        <Welcome />
-      </Suspense>
+      <Welcome />
 
       {q.isError && <ErrorState className="panel" title="Your dashboard could not be loaded" message={(q.error as Error).message} onRetry={() => q.refetch()} />}
 

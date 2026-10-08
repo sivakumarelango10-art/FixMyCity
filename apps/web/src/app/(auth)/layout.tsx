@@ -39,6 +39,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                 width={1440}
                 height={900}
                 sizes="50vw"
+                loading="eager"
                 className={`aspect-[16/10] w-full object-cover object-left-top ${theme === 'dark' ? 'hidden dark:block' : 'block dark:hidden'}`}
               />
             ))}

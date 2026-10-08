@@ -27,6 +27,8 @@ export interface NavItem {
   icon: Icon;
   /** Match only the exact path (for section roots). */
   exact?: boolean;
+  /** Shorter label where horizontal space is tight (citizen top bar). */
+  short?: string;
 }
 
 export interface NavGroup {
@@ -112,7 +114,7 @@ export const CITIZEN_TOP_NAV: NavItem[] = [
   { href: '/dashboard/city-map', label: 'City Map', icon: MapTrifold },
   { href: '/dashboard/announcements', label: 'City Updates', icon: Megaphone },
   { href: '/dashboard/utilities', label: 'Utilities', icon: CreditCard },
-  { href: '/dashboard/help', label: 'Services & Help', icon: Lifebuoy },
+  { href: '/dashboard/help', label: 'Services & Help', short: 'Help', icon: Lifebuoy },
 ];
 
 export function navForRole(role: Role): NavGroup[] {

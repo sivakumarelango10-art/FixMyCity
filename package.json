@@ -28,6 +28,7 @@
     "postinstall": "prisma generate",
     "db:validate": "prisma validate",
     "db:status": "node scripts/db-guard.mjs && prisma migrate status",
+    "db:help": "node scripts/db-help.mjs",
     "db:reset:local": "node scripts/db-guard.mjs --local-only --confirm-reset && prisma migrate reset --force",
     "db:test:prepare": "node scripts/with-env.mjs .env.test -- prisma migrate deploy"
   },

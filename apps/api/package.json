@@ -15,9 +15,11 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.132.0",
     "@fixmycity/shared": "*",
+    "@google/genai": "^2.28.0",
     "@node-rs/argon2": "^2.0.2",
     "@prisma/client": "^6.19.0",
     "@supabase/server": "^1.9.1",
+    "@supabase/supabase-js": "^2.117.3",
     "aws4fetch": "^1.0.20",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",

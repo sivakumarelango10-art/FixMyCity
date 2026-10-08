@@ -602,3 +602,53 @@
     animation-delay: var(--enter-delay, 0ms);
   }
 }
+
+/* Scroll-driven reveal: progressive enhancement only. Content is never hidden
+   unless the browser can run the scroll timeline and motion is welcome. */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes draw-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes draw-y {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry calc(5% + var(--reveal-offset, 0%)) entry calc(55% + var(--reveal-offset, 0%));
+    }
+    .route-draw {
+      transform-origin: top;
+      animation: draw-y linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 45%;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
+    .route-draw {
+      transform-origin: left;
+      animation-name: draw-x;
+    }
+  }
+}

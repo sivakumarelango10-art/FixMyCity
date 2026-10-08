@@ -25,7 +25,7 @@ import { useReducedMotionSafe } from '@/lib/hooks';
  * - every chart has a hover tooltip and a table view
  */
 
-const AXIS = { fontSize: 12, fill: 'var(--fg-subtle)' };
+const AXIS = { fontSize: 12, fill: 'var(--text-muted)' };
 
 function useChartAnimation() {
   const reduce = useReducedMotionSafe();
@@ -169,10 +169,10 @@ export function HorizontalBars({ data, valueLabel = 'Complaints' }: { data: { la
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} layout="vertical" margin={{ top: 4, right: 24, bottom: 4, left: 8 }} barCategoryGap={6}>
-        <CartesianGrid horizontal={false} stroke="var(--line)" />
+        <CartesianGrid horizontal={false} stroke="var(--border)" />
         <XAxis type="number" allowDecimals={false} tick={AXIS} axisLine={false} tickLine={false} />
-        <YAxis type="category" dataKey="label" width={150} tick={{ ...AXIS, fill: 'var(--fg-muted)' }} axisLine={false} tickLine={false} />
-        <Tooltip cursor={{ fill: 'var(--surface-2)' }} content={(p) => tip(p)} />
+        <YAxis type="category" dataKey="label" width={150} tick={{ ...AXIS, fill: 'var(--text-secondary)' }} axisLine={false} tickLine={false} />
+        <Tooltip cursor={{ fill: 'var(--surface-sunken)' }} content={(p) => tip(p)} />
         <Bar dataKey="value" name={valueLabel} fill="var(--chart-1)" radius={[0, 4, 4, 0]} maxBarSize={22} {...anim} />
       </BarChart>
     </ResponsiveContainer>
@@ -185,10 +185,10 @@ export function ColumnBars({ data, valueLabel = 'Complaints', colors }: { data: 
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} margin={{ top: 8, right: 8, bottom: 4, left: -16 }} barCategoryGap="22%">
-        <CartesianGrid vertical={false} stroke="var(--line)" />
+        <CartesianGrid vertical={false} stroke="var(--border)" />
         <XAxis dataKey="label" tick={AXIS} axisLine={false} tickLine={false} interval={0} />
         <YAxis allowDecimals={false} tick={AXIS} axisLine={false} tickLine={false} />
-        <Tooltip cursor={{ fill: 'var(--surface-2)' }} content={(p) => tip(p)} />
+        <Tooltip cursor={{ fill: 'var(--surface-sunken)' }} content={(p) => tip(p)} />
         <Bar dataKey="value" name={valueLabel} fill="var(--chart-1)" radius={[4, 4, 0, 0]} maxBarSize={44} {...anim}>
           {colors && data.map((_, i) => <Cell key={i} fill={colors[i % colors.length]} />)}
         </Bar>
@@ -221,12 +221,12 @@ export function TrendLines({
   const last = data.length - 1;
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <LineChart data={data} margin={{ top: 12, right: 28, bottom: 4, left: -16 }}>
-        <CartesianGrid vertical={false} stroke="var(--line)" />
+      <LineChart data={data} margin={{ top: 12, right: series.length > 1 ? 76 : 20, bottom: 4, left: -16 }}>
+        <CartesianGrid vertical={false} stroke="var(--border)" />
         <XAxis dataKey={xKey} tick={AXIS} axisLine={false} tickLine={false} tickFormatter={formatX} minTickGap={24} />
         <YAxis allowDecimals={false} tick={AXIS} axisLine={false} tickLine={false} tickFormatter={formatValue} />
         <Tooltip
-          cursor={{ stroke: 'var(--line-strong)', strokeWidth: 1 }}
+          cursor={{ stroke: 'var(--border-strong)', strokeWidth: 1 }}
           content={(p) => {
             const raw = (p as TipProps).label;
             return tip(p, { label: raw !== undefined && formatX ? formatX(String(raw)) : raw, formatter: formatValue });
@@ -235,7 +235,7 @@ export function TrendLines({
         {series.map((s) => (
           <Line
             key={s.key}
-            type="monotone"
+            type="linear"
             dataKey={s.key}
             name={s.label}
             stroke={s.color}
@@ -245,7 +245,7 @@ export function TrendLines({
             label={(raw: unknown) => {
               const props = raw as { index?: number; x?: number | string; y?: number | string };
               return props.index === last && series.length > 1 ? (
-                <text x={Number(props.x) + 6} y={Number(props.y) + 4} fontSize={11} fill="var(--fg-muted)">
+                <text x={Number(props.x) + 6} y={Number(props.y) + 4} fontSize={11} fill="var(--text-secondary)">
                   {s.label}
                 </text>
               ) : (
@@ -274,10 +274,10 @@ export function StackedBars({
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} margin={{ top: 8, right: 8, bottom: 4, left: -16 }} barCategoryGap="26%">
-        <CartesianGrid vertical={false} stroke="var(--line)" />
+        <CartesianGrid vertical={false} stroke="var(--border)" />
         <XAxis dataKey={xKey} tick={AXIS} axisLine={false} tickLine={false} interval={0} />
         <YAxis allowDecimals={false} tick={AXIS} axisLine={false} tickLine={false} />
-        <Tooltip cursor={{ fill: 'var(--surface-2)' }} content={(p) => tip(p)} />
+        <Tooltip cursor={{ fill: 'var(--surface-sunken)' }} content={(p) => tip(p)} />
         {series.map((s, i) => (
           <Bar
             key={s.key}
