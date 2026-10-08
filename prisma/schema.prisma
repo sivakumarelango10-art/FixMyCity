@@ -1,0 +1,513 @@
+// FixMyCity data model.
+// Tables are snake_case; columns keep Prisma's camelCase names.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// DATABASE_URL: runtime connection (local Postgres, or Supabase's session pooler on 5432).
+// DIRECT_URL:   migrations (same as DATABASE_URL locally; Supabase session pooler or direct host in the cloud).
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/* ----------------------------------------------------------------- */
+/* Enums                                                              */
+/* ----------------------------------------------------------------- */
+
+enum Role {
+  CITIZEN
+  DEPARTMENT_OFFICER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum ComplaintStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  ASSIGNED
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+  REOPENED
+}
+
+enum ComplaintCategory {
+  POTHOLES
+  ROAD_DAMAGE
+  WATER_LEAKAGE
+  GARBAGE_COLLECTION
+  STREETLIGHT_FAILURE
+  DRAINAGE
+  PUBLIC_SANITATION
+  TRAFFIC_INFRASTRUCTURE
+  PUBLIC_PROPERTY_DAMAGE
+  OTHER
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum AttachmentKind {
+  EVIDENCE
+  RESOLUTION
+}
+
+enum NoteVisibility {
+  PUBLIC
+  INTERNAL
+}
+
+enum ClassificationSource {
+  LLM
+  RULE_BASED
+}
+
+enum ReviewOutcome {
+  PENDING
+  ACCEPTED
+  OVERRIDDEN
+}
+
+enum DepartmentMemberRole {
+  OFFICER
+  LEAD
+}
+
+enum UtilityServiceType {
+  ELECTRICITY
+  WATER
+  PROPERTY_TAX
+  WASTE_MANAGEMENT
+}
+
+enum BillStatus {
+  UNPAID
+  PAID
+}
+
+enum PaymentStatus {
+  SUCCEEDED
+  FAILED
+}
+
+enum AnnouncementCategory {
+  GENERAL
+  SERVICE_UPDATE
+  MAINTENANCE
+  EMERGENCY
+  EVENT
+  ADVISORY
+}
+
+enum AnnouncementStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum NotificationType {
+  COMPLAINT_RECEIVED
+  COMPLAINT_ASSIGNED
+  COMPLAINT_STATUS
+  COMPLAINT_RESOLVED
+  COMPLAINT_NOTE
+  ANNOUNCEMENT
+  PAYMENT
+  SYSTEM
+}
+
+/* ----------------------------------------------------------------- */
+/* Identity & access                                                  */
+/* ----------------------------------------------------------------- */
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(CITIZEN)
+  phone        String?
+  ward         String?
+  avatarUrl    String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions            Session[]
+  passwordResets      PasswordResetToken[]
+  memberships         DepartmentMembership[]
+  complaints          Complaint[]              @relation("CitizenComplaints")
+  resolvedComplaints  Complaint[]              @relation("ResolvedBy")
+  attachments         ComplaintAttachment[]
+  assignmentsMade     ComplaintAssignment[]
+  statusChanges       ComplaintStatusHistory[]
+  notes               ComplaintNote[]
+  classificationReviews AIClassification[]     @relation("ClassificationReviewer")
+  feedback            ComplaintFeedback[]
+  utilityAccounts     UtilityAccount[]
+  payments            DemoPayment[]
+  announcements       Announcement[]
+  notifications       Notification[]
+  auditLogs           AuditLog[]
+
+  @@index([role])
+  @@map("users")
+}
+
+model Session {
+  id         String   @id @default(uuid()) @db.Uuid
+  tokenHash  String   @unique
+  userId     String   @db.Uuid
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  lastSeenAt DateTime @default(now())
+  userAgent  String?
+  ipAddress  String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  tokenHash String    @unique
+  userId    String    @db.Uuid
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+/* ----------------------------------------------------------------- */
+/* Departments                                                        */
+/* ----------------------------------------------------------------- */
+
+model Department {
+  id           String   @id @default(uuid()) @db.Uuid
+  code         String   @unique
+  name         String   @unique
+  description  String
+  contactEmail String?
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  memberships         DepartmentMembership[]
+  complaints          Complaint[]
+  assignments         ComplaintAssignment[]  @relation("AssignedDepartment")
+  previousAssignments ComplaintAssignment[]  @relation("PreviousDepartment")
+  classifications     AIClassification[]
+
+  @@map("departments")
+}
+
+model DepartmentMembership {
+  id           String               @id @default(uuid()) @db.Uuid
+  userId       String               @db.Uuid
+  departmentId String               @db.Uuid
+  role         DepartmentMemberRole @default(OFFICER)
+  createdAt    DateTime             @default(now())
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, departmentId])
+  @@index([departmentId])
+  @@map("department_memberships")
+}
+
+/* ----------------------------------------------------------------- */
+/* Complaints                                                         */
+/* ----------------------------------------------------------------- */
+
+model Complaint {
+  id                   String            @id @default(uuid()) @db.Uuid
+  /// Backed by a Postgres sequence. Values are reserved with nextval() before insert.
+  trackingNumber       Int               @unique @default(autoincrement())
+  trackingId           String            @unique
+  citizenId            String            @db.Uuid
+  title                String
+  description          String
+  additionalNotes      String?
+  category             ComplaintCategory
+  priority             Priority          @default(MEDIUM)
+  currentStatus        ComplaintStatus   @default(SUBMITTED)
+  assignedDepartmentId String?           @db.Uuid
+  latitude             Float
+  longitude            Float
+  address              String
+  isPublic             Boolean           @default(true)
+  isDemo               Boolean           @default(false)
+  resolutionSummary    String?
+  resolvedAt           DateTime?
+  resolvedById         String?           @db.Uuid
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  citizen            User                     @relation("CitizenComplaints", fields: [citizenId], references: [id], onDelete: Restrict)
+  assignedDepartment Department?              @relation(fields: [assignedDepartmentId], references: [id], onDelete: SetNull)
+  resolvedBy         User?                    @relation("ResolvedBy", fields: [resolvedById], references: [id], onDelete: SetNull)
+  attachments        ComplaintAttachment[]
+  assignments        ComplaintAssignment[]
+  statusHistory      ComplaintStatusHistory[]
+  notes              ComplaintNote[]
+  classifications    AIClassification[]
+  feedback           ComplaintFeedback?
+
+  @@index([citizenId, createdAt])
+  @@index([currentStatus])
+  @@index([category])
+  @@index([assignedDepartmentId, currentStatus])
+  @@index([createdAt])
+  @@index([latitude, longitude])
+  @@map("complaints")
+}
+
+model ComplaintAttachment {
+  id           String         @id @default(uuid()) @db.Uuid
+  complaintId  String         @db.Uuid
+  uploadedById String         @db.Uuid
+  storageKey   String         @unique
+  originalName String?
+  mimeType     String
+  fileSize     Int
+  width        Int?
+  height       Int?
+  kind         AttachmentKind @default(EVIDENCE)
+  uploadedAt   DateTime       @default(now())
+
+  complaint  Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  uploadedBy User      @relation(fields: [uploadedById], references: [id], onDelete: Restrict)
+
+  @@index([complaintId])
+  @@map("complaint_attachments")
+}
+
+model ComplaintAssignment {
+  id                   String   @id @default(uuid()) @db.Uuid
+  complaintId          String   @db.Uuid
+  departmentId         String   @db.Uuid
+  previousDepartmentId String?  @db.Uuid
+  assignedById         String   @db.Uuid
+  assignedAt           DateTime @default(now())
+  notes                String?
+
+  complaint          Complaint   @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  department         Department  @relation("AssignedDepartment", fields: [departmentId], references: [id], onDelete: Restrict)
+  previousDepartment Department? @relation("PreviousDepartment", fields: [previousDepartmentId], references: [id], onDelete: SetNull)
+  assignedBy         User        @relation(fields: [assignedById], references: [id], onDelete: Restrict)
+
+  @@index([complaintId, assignedAt])
+  @@index([departmentId])
+  @@map("complaint_assignments")
+}
+
+model ComplaintStatusHistory {
+  id             String           @id @default(uuid()) @db.Uuid
+  complaintId    String           @db.Uuid
+  previousStatus ComplaintStatus?
+  newStatus      ComplaintStatus
+  changedById    String?          @db.Uuid
+  reason         String?
+  createdAt      DateTime         @default(now())
+
+  complaint Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  changedBy User?     @relation(fields: [changedById], references: [id], onDelete: SetNull)
+
+  @@index([complaintId, createdAt])
+  @@index([newStatus, createdAt])
+  @@map("complaint_status_history")
+}
+
+model ComplaintNote {
+  id          String         @id @default(uuid()) @db.Uuid
+  complaintId String         @db.Uuid
+  authorId    String         @db.Uuid
+  body        String
+  visibility  NoteVisibility @default(PUBLIC)
+  createdAt   DateTime       @default(now())
+
+  complaint Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([complaintId, createdAt])
+  @@map("complaint_notes")
+}
+
+model AIClassification {
+  id                      String               @id @default(uuid()) @db.Uuid
+  complaintId             String               @db.Uuid
+  suggestedCategory       ComplaintCategory
+  suggestedDepartmentCode String
+  suggestedDepartmentId   String?              @db.Uuid
+  suggestedPriority       Priority
+  explanation             String
+  classificationSource    ClassificationSource
+  model                   String?
+  signals                 String[]             @default([])
+  reviewOutcome           ReviewOutcome        @default(PENDING)
+  reviewedById            String?              @db.Uuid
+  reviewedAt              DateTime?
+  createdAt               DateTime             @default(now())
+
+  complaint           Complaint   @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  suggestedDepartment Department? @relation(fields: [suggestedDepartmentId], references: [id], onDelete: SetNull)
+  reviewedBy          User?       @relation("ClassificationReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([complaintId, createdAt])
+  @@map("ai_classifications")
+}
+
+model ComplaintFeedback {
+  id          String   @id @default(uuid()) @db.Uuid
+  complaintId String   @unique @db.Uuid
+  citizenId   String   @db.Uuid
+  rating      Int
+  comment     String?
+  createdAt   DateTime @default(now())
+
+  complaint Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  citizen   User      @relation(fields: [citizenId], references: [id], onDelete: Cascade)
+
+  @@map("complaint_feedback")
+}
+
+/* ----------------------------------------------------------------- */
+/* Utilities (simulated)                                              */
+/* ----------------------------------------------------------------- */
+
+model UtilityAccount {
+  id                String             @id @default(uuid()) @db.Uuid
+  citizenId         String             @db.Uuid
+  serviceType       UtilityServiceType
+  demoAccountNumber String             @unique
+  serviceAddress    String?
+  createdAt         DateTime           @default(now())
+
+  citizen User          @relation(fields: [citizenId], references: [id], onDelete: Cascade)
+  bills   UtilityBill[]
+
+  @@unique([citizenId, serviceType])
+  @@map("utility_accounts")
+}
+
+model UtilityBill {
+  id               String     @id @default(uuid()) @db.Uuid
+  utilityAccountId String     @db.Uuid
+  amount           Decimal    @db.Decimal(12, 2)
+  billingPeriod    String
+  periodStart      DateTime
+  periodEnd        DateTime
+  dueDate          DateTime
+  status           BillStatus @default(UNPAID)
+  unitsConsumed    Decimal?   @db.Decimal(12, 2)
+  unitLabel        String?
+  paidAt           DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  account  UtilityAccount @relation(fields: [utilityAccountId], references: [id], onDelete: Cascade)
+  payments DemoPayment[]  @relation("BillPayments")
+  successfulPayment DemoPayment? @relation("SuccessfulPayment")
+
+  @@unique([utilityAccountId, billingPeriod])
+  @@index([utilityAccountId, status])
+  @@index([dueDate])
+  @@map("utility_bills")
+}
+
+model DemoPayment {
+  id               String        @id @default(uuid()) @db.Uuid
+  billId           String        @db.Uuid
+  citizenId        String        @db.Uuid
+  amount           Decimal       @db.Decimal(12, 2)
+  status           PaymentStatus
+  idempotencyKey   String        @unique
+  referenceNumber  String        @unique
+  /// Set only for a successful payment. The unique constraint guarantees one success per bill.
+  successfulBillId String?       @unique @db.Uuid
+  createdAt        DateTime      @default(now())
+
+  bill           UtilityBill  @relation("BillPayments", fields: [billId], references: [id], onDelete: Cascade)
+  successfulBill UtilityBill? @relation("SuccessfulPayment", fields: [successfulBillId], references: [id], onDelete: Cascade)
+  citizen        User         @relation(fields: [citizenId], references: [id], onDelete: Cascade)
+
+  @@index([citizenId, createdAt])
+  @@index([billId])
+  @@map("demo_payments")
+}
+
+/* ----------------------------------------------------------------- */
+/* City information                                                   */
+/* ----------------------------------------------------------------- */
+
+model Announcement {
+  id          String               @id @default(uuid()) @db.Uuid
+  title       String
+  summary     String?
+  content     String
+  category    AnnouncementCategory @default(GENERAL)
+  status      AnnouncementStatus   @default(DRAFT)
+  pinned      Boolean              @default(false)
+  isDemo      Boolean              @default(false)
+  publishedAt DateTime?
+  expiresAt   DateTime?
+  createdById String               @db.Uuid
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Restrict)
+
+  @@index([status, publishedAt])
+  @@map("announcements")
+}
+
+model Notification {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @db.Uuid
+  type      NotificationType
+  title     String
+  message   String
+  link      String?
+  isRead    Boolean          @default(false)
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  actorId    String?  @db.Uuid
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

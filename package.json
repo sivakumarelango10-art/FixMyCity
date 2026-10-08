@@ -1,0 +1,52 @@
+{
+  "name": "fixmycity",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FixMyCity: One City. One Platform. Every Service. A unified platform for civic issue reporting, complaint tracking, utility services and city information.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c blue,cyan \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "npm run dev -w @fixmycity/api",
+    "dev:web": "npm run dev -w @fixmycity/web",
+    "build": "npm run build -w @fixmycity/api && npm run build -w @fixmycity/web",
+    "start": "concurrently -k -n api,web -c blue,cyan \"npm run start -w @fixmycity/api\" \"npm run start -w @fixmycity/web\"",
+    "typecheck": "npm run typecheck -w @fixmycity/shared && npm run typecheck -w @fixmycity/api && npm run typecheck -w @fixmycity/web",
+    "lint": "npm run lint -w @fixmycity/api && npm run lint -w @fixmycity/web",
+    "test": "npm run test -w @fixmycity/shared && npm run test -w @fixmycity/api",
+    "test:e2e": "npm run test:e2e -w @fixmycity/web",
+    "db:generate": "prisma generate",
+    "db:migrate": "node scripts/db-guard.mjs --local-only && prisma migrate dev",
+    "db:deploy": "node scripts/db-guard.mjs && prisma migrate deploy",
+    "db:seed": "node scripts/db-guard.mjs && prisma db seed",
+    "db:studio": "prisma studio",
+    "db:local:start": "node scripts/local-postgres.mjs start",
+    "db:local:stop": "node scripts/local-postgres.mjs stop",
+    "db:local:init": "node scripts/local-postgres.mjs init",
+    "postinstall": "prisma generate",
+    "db:validate": "prisma validate",
+    "db:status": "node scripts/db-guard.mjs && prisma migrate status",
+    "db:reset:local": "node scripts/db-guard.mjs --local-only --confirm-reset && prisma migrate reset --force",
+    "db:test:prepare": "node scripts/with-env.mjs .env.test -- prisma migrate deploy"
+  },
+  "prisma": {
+    "schema": "prisma/schema.prisma",
+    "seed": "tsx prisma/seed.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "concurrently": "^9.2.0",
+    "prisma": "^6.19.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  },
+  "dependencies": {
+    "@node-rs/argon2": "^2.0.2",
+    "@prisma/client": "^6.19.0"
+  },
+  "engines": {
+    "node": ">=20.11"
+  }
+}

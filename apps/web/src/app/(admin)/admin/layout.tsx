@@ -1,0 +1,14 @@
+import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import { homePathForRole, isAdminRole } from '@fixmycity/shared';
+import { Workspace } from '@/components/layout/workspace';
+import { getSessionUser } from '@/lib/session';
+
+export const metadata: Metadata = { title: { default: 'Municipal admin', template: '%s | FixMyCity' } };
+
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const user = await getSessionUser();
+  if (!user) redirect('/login?expired=1&next=/admin');
+  if (!isAdminRole(user.role)) redirect(homePathForRole(user.role));
+  return <Workspace user={user}>{children}</Workspace>;
+}
